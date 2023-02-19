@@ -4,31 +4,7 @@ const ogDescription = 'Machine Learning GPU and Data Server Guide'
 const ogImage = 'og-image.png'
 const ogTitle = 'RoseLab'
 const ogUrl = 'https://rose-stl-lab.github.io'
-
-// netlify envs
-const deployURL = process.env.DEPLOY_PRIME_URL || ''
-const commitRef = process.env.COMMIT_REF?.slice(0, 8) || 'dev'
-
-const deployType = (() => {
-  switch (deployURL) {
-    case 'https://rose-stl-lab.github.io/':
-      return 'main'
-    case '':
-      return 'local'
-    default:
-      return 'release'
-  }
-})()
-const additionalTitle = ((): string => {
-  switch (deployType) {
-    case 'main':
-      return ' (main branch)'
-    case 'local':
-      return ' (local)'
-    case 'release':
-      return ''
-  }
-})()
+const additionalTitle = ''
 
 export default defineConfig({
   title: `RoseLab${additionalTitle}`,
@@ -66,7 +42,7 @@ export default defineConfig({
     // },
 
     footer: {
-      message: `Released under the MIT License. (${commitRef})`,
+      message: `Released under the MIT License.`,
       copyright: 'Made by Zihao Zhou with ❤️',
     },
 
