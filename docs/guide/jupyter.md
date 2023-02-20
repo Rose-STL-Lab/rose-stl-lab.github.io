@@ -6,7 +6,7 @@ This guide is applicable only to who requested Jupyter Lab.
 
 ## Quick Start
 
-If you did not request port mapping in your account request form, you will need to use an SSH reverse proxy to access your Jupyter service. After confirming that you can successfully SSH into the server, run the following command:
+If you did not request port mapping, you will need to use an SSH reverse proxy to access your Jupyter service. After confirming that you can successfully SSH into the server, run the following command:
 
 ```bash
 laptop$ ssh -fN -L 8888:localhost:8888 ubuntu@roselab1.ucsd.edu -p ssh-port -i path/to/keyfile

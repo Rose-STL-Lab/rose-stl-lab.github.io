@@ -6,7 +6,7 @@ This guide is applicable only to users who requested Remote Desktop.
 
 ## Quick Start
 
-If you did not request port mapping in your account request form, you will need to use an SSH reverse proxy to access your Remote Desktop service. After confirming that you can successfully SSH into the server, run the following command:
+If you did not request port mapping, you will need to use an SSH reverse proxy to access your Remote Desktop service. After confirming that you can successfully SSH into the server, run the following command:
 
 ```bash
 laptop$ ssh -fN -L 3389:localhost:3389 ubuntu@roselab1.ucsd.edu -p ssh-port -i path/to/keyfile
