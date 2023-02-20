@@ -70,7 +70,7 @@ ubuntu@account$ kill -9 1266303
 
 It is technically feasible to create a Docker container inside your container, but it is not allowed by default. Most Docker containers require intercepting and emulating system calls, which cannot be executed in default unprivileged containers. While the host can grant such permission, a privileged server is not always root-safe. In other words, if a privileged container is compromised, a hacker may escape from the container and breach the host OS.
 
-> LXC upstream's position is that those containers aren't and cannot be root-safe. They are still valuable in an environment where you are running trusted workloads or where no untrusted task is running as root in the container. —— [LXC Security]([Linux Containers - LXC - Security](https://linuxcontainers.org/lxc/security/))
+> LXC upstream's position is that those containers aren't and cannot be root-safe. They are still valuable in an environment where you are running trusted workloads or where no untrusted task is running as root in the container. —— [Linux Containers - LXC - Security](https://linuxcontainers.org/lxc/security/)
 
 Our position is Docker-based development should be deployed to the Nautilus cluster. However, you may request privilege on a short term basis with valid reason (e.g., to build a Docker image for your accepted paper).
 
