@@ -50,7 +50,7 @@ To view the status of your GPU processes, you can visit the Grafana [GPU process
 
 Even though you cannot see the running processes in `nvidia-smi`, you can still locate them in `ps aux`. For example, to kill all your python processes, run
 
-```python
+```bash
 kill $(ps aux | grep '[p]ython' | awk '{print $2}')
 ```
 
@@ -58,7 +58,7 @@ kill $(ps aux | grep '[p]ython' | awk '{print $2}')
 
 The same process's PID on the container OS and on the host OS has no correlation due to [implementation complication](https://github.com/lxc/lxd/issues/3485), so you cannot kill a process by its PID shown on Grafana. Killing all `python` processes will also restart your Jupyter Lab. A better approach is to use `ps aux | grep '[p]ython' ` to identify the PID first.
 
-```python
+```bash
 ubuntu@account$ ps aux | grep '[p]ython'
 ubuntu 1266303 ... python3 run.py ...
 ubuntu@account$ kill -9 1266303

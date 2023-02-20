@@ -59,7 +59,7 @@ rm -rf /home/ubuntu/.local/share/jupyter/kernels/py38
 
 If Jupyter Lab shuts down unexpectedly or doesn't accept your connection, run the following command to see the service log:
 
-```python
+```bash
 $ journalctl -u jupyterlab -n 100  # Show last 100 lines of the log
 ...
 Feb 15 23:44:33 user systemd[1]: jupyterlab.service: A process of this unit has been killed by the OOM killer.
