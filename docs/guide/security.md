@@ -8,7 +8,7 @@ To update your password for various accounts, follow these steps:
 | ----------------------- | ------------------------------------------------------------ |
 | System / Remote Desktop | Enter `sudo passwd ubuntu` in the command line               |
 | Jupyter Lab             | Edit the file `~/.jupyter/jupyter_lab_config.py` and change the value of `c.ServerApp.token` |
-| Seafile                 | Navigate to [Settings - Private Seafile (ucsd.edu)](http://roselab1.ucsd.edu/seafile/profile/#update-user-passwd) |
+| Seafile                 | Navigate to [Settings - Private Seafile](http://roselab1.ucsd.edu/seafile/profile/#update-user-passwd) |
 | SSH                     | Change the `~/.ssh/authorized_keys` file to include your new public key |
 | HedgeDoc                | Currently unsupported                                        |
 

@@ -58,7 +58,7 @@ If Solution 1 does not work, you can run `reboot` and try connecting again. It w
 
 ### I want multiple concurrent xRDP sessions
 
-The recommended way is the Workaround 3 in this [article][xRDP – Allow multiple sessions (local and remote) for the same user – HowTo – Griffon's IT Library (c-nergy.be)](https://c-nergy.be/blog/?p=16698).
+The recommended way is the Workaround 3 in this [article](https://c-nergy.be/blog/?p=16698).
 
 > Simply open the /etc/xrdp/startwm.sh with your favorite text editor..
 >
