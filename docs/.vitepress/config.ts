@@ -35,7 +35,7 @@ export default defineConfig({
     algolia: {
       appId: 'FP0L9RXYN5',
       apiKey: '882c31582e3db529893eb98864716305',
-      indexName: 'roselab',
+      indexName: 'rose-stl-labio',
       searchParameters: {
         facetFilters: ['tags:en'],
       },
