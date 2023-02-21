@@ -32,14 +32,14 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/Rose-STL-Lab' },
     ],
 
-    // algolia: {
-    //   appId: '7H67QR5P0A',
-    //   apiKey: 'deaab78bcdfe96b599497d25acc6460e',
-    //   indexName: 'roselab',
-    //   searchParameters: {
-    //     facetFilters: ['tags:en'],
-    //   },
-    // },
+    algolia: {
+      appId: 'FP0L9RXYN5',
+      apiKey: '882c31582e3db529893eb98864716305',
+      indexName: 'roselab',
+      searchParameters: {
+        facetFilters: ['tags:en'],
+      },
+    },
 
     footer: {
       message: `Released under the MIT License.`,
