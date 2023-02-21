@@ -36,9 +36,7 @@ export default defineConfig({
       appId: 'FP0L9RXYN5',
       apiKey: '882c31582e3db529893eb98864716305',
       indexName: 'rose-stl-labio',
-      searchParameters: {
-        facetFilters: ['tags:en'],
-      },
+      searchParameters: {},
     },
 
     footer: {
