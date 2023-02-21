@@ -46,11 +46,10 @@ Once your request is approved, you will receive an email containing two tables:
 > | description            | account | password   |
 >| ---------------------- | ------- | ---------- |
 > | System, Remote Desktop | ubuntu  | <token1\>  |
-> | Jupyter                | -       | <token2\>  |
-> | Seafile                |         | <token3\>  |
+> | Seafile                |         | <token2\>  |
 > | SSH                    | ubuntu  | <keyfile\> |
 
-Keep the tables in a secure place and do not share with others. 
+You Jupyter token is at line 991 of `~/.jupyter/jupyter_lab_config.py`. Keep the tables in a secure place and do not share with others. 
 
 ::: tip Note
 [OS-level virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization) makes each isolated container look like a dedicated machine from inside, so everyone's username is `ubuntu` . Different containers differ by its hostname. It is *not recommended* to change the username, as you would have a lot of troubles with static configurations.
