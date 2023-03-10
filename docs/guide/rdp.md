@@ -46,11 +46,21 @@ You are welcome to add more options to this list.
 
 ### xRDP shows only black screen after authentication windows
 
-This is a common problem for Ubuntu xRDP. The usual cause is that [you logged in the machine through RDP and SSH simultaneously](https://c-nergy.be/blog/?p=16682). 
+This is a common problem for Ubuntu xRDP. The usual cause is that [you logged in the machine through RDP for multiple sessions](https://c-nergy.be/blog/?p=16682). 
 
 #### Solution 1
 
-Log out of all other sessions, restart the xrdp service by using `systemctl restart xrdp`, and then try again.
+First, check your xrdp sessions by using `ps aux | grep xrdp`. You are expected to see multiple running `xOrg`.
+
+```bash
+root       42863  0.0  0.0  16592  1928 ?        S    Feb24   0:00 /usr/sbin/xrdp-sesman
+ubuntu     42878  0.2  0.1 446524 160192 ?       Sl   Feb24  15:39 /usr/lib/xorg/Xorg :10 -auth .Xauthority -config xrdp/xorg.conf -noreset -nolisten tcp -logfile .xorgxrdp.%s.log
+ubuntu     42934  0.0  0.0  88600  3740 ?        Sl   Feb24   0:00 /usr/sbin/xrdp-chansrv
+root     3662761  0.0  0.0  16444  4088 ?        S    15:49   0:00 /usr/sbin/xrdp-sesman
+ubuntu   3662763  0.0  0.0 283224 50692 ?        Sl   15:49   0:00 /usr/lib/xorg/Xorg :11 -auth .Xauthority -config xrdp/xorg.conf -noreset -nolisten tcp -logfile .xorgxrdp.%s.log
+...
+```
+Kill all sessions by `pkill xrdp`, then restart the xrdp service by using `systemctl restart xrdp`.
 
 #### Solution 2
 
