@@ -60,7 +60,7 @@ root     3662761  0.0  0.0  16444  4088 ?        S    15:49   0:00 /usr/sbin/xrd
 ubuntu   3662763  0.0  0.0 283224 50692 ?        Sl   15:49   0:00 /usr/lib/xorg/Xorg :11 -auth .Xauthority -config xrdp/xorg.conf -noreset -nolisten tcp -logfile .xorgxrdp.%s.log
 ...
 ```
-Kill all sessions by `sudo pkill -9 xrdp`, then restart the xrdp service by using `sudo systemctl restart xrdp`.
+Kill all sessions by `sudo pkill -9 xrdp` and `sudo pkill -9 Xorg`, then restart the xrdp service by using `sudo systemctl restart xrdp`.
 
 #### Solution 2
 
