@@ -92,10 +92,9 @@ This workaround is not enabled by default because it has some limitations, such 
 If you want to use your Ubuntu desktop for serious development (e.g., with PyCharm), you may find that the default desktop is too "clean" and lacks the necessary software and features. In this case, you can install additional software by running the following commands:
 
 ```bash
-sudo apt remove ubuntu-desktop
-sudo apt-get update
-sudo apt install ubuntu-desktop --install-recommends
-sudo reboot
+sudo apt install gnome-software
+sudo snap install snap-store
+sudo apt install ubuntu-restricted-extras
 ```
 
 You can also try using other desktop environments, such as the KDE Plasma Desktop, and customize your desktop to suit your needs.
