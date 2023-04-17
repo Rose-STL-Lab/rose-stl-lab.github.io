@@ -70,6 +70,8 @@ ssh ubuntu@roselab1.ucsd.edu -p [id]00 -i ~/.ssh/keyfile
 (base) ubuntu@account:~$
 ```
 
+There are instances where ssh request is blocked when using `UCSD-GUEST`. Switch to another wifi network if this issue occurs. 
+
 ### Know Your Container
 
 Now let's check the resources assigned to you. First, use `lscpu` to check the CPU cores. Although the CPU indices may differ, you should see 12 online CPU cores. Here's an example output:
