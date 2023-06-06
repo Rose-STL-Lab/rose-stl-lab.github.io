@@ -2,6 +2,11 @@
 
 ## Update Your Password
 
+:::warning
+
+If you choose to change the password, please use a strong password, especially if your service is publicly accessible. 
+:::
+
 To update your password for various accounts, follow these steps:
 
 | Account                 | How to update password                                       |
@@ -11,6 +16,7 @@ To update your password for various accounts, follow these steps:
 | Seafile                 | Navigate to [Settings - Private Seafile](http://roselab1.ucsd.edu/seafile/profile/#update-user-passwd) |
 | SSH                     | Change the `~/.ssh/authorized_keys` file to include your new public key |
 | HedgeDoc                | Currently unsupported                                        |
+| MinIO                   | Currently unsupported                                        |
 
 ## Require Password for Sudo
 

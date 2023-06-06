@@ -2,7 +2,7 @@
 
 ## Overview
 
-The RoseLab servers are the primary machine learning servers owned and managed by the UCSD CSE [Rose Lab](https://roseyu.com). These servers offer a versatile platform for machine learning researchers to develop and run their models within [Linux Containers](https://linuxcontainers.org/). In addition, RoseLab servers provide access to [Grafana](http://roselab1.ucsd.edu/grafana/) for real-time machine metrics tracking and [Seafile](http://roselab1.ucsd.edu/seafile) for convenient data sharing. Further web applications are planned to be added in the future to support the needs of researchers.
+The RoseLab servers are the primary machine learning servers owned and managed by the UCSD CSE [Rose Lab](https://roseyu.com). These servers offer a versatile platform for machine learning researchers to develop and run their models within [Linux Containers](https://linuxcontainers.org/). In addition, RoseLab servers provide access to [Grafana](http://roselab1.ucsd.edu/grafana/) for real-time machine metrics tracking, [Seafile](http://roselab1.ucsd.edu/seafile) for convenient data sharing and backup, [MinIO](https://rosedata.ucsd.edu) for hosting S3 dataset, and [Hedgedoc](https://roselab1.ucsd.edu/hedgedoc) for online markdown collaboration. Further web applications are planned to be added in the future to support the needs of researchers.
 
 ### Hardware
 
