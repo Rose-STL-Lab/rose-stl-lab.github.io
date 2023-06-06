@@ -43,13 +43,16 @@ Once your request is approved, you will receive an email containing two tables:
 > | 8889 (Backup)                  | <id\>07   |
 > | 8890 (Backup)                  | <id\>08   |
 >
-> | description            | account | password   |
->| ---------------------- | ------- | ---------- |
-> | System, Remote Desktop | ubuntu  | <token1\>  |
-> | Seafile                |         | <token2\>  |
-> | SSH                    | ubuntu  | <keyfile\> |
+> | description            | account  | password   |
+> | ---------------------- | -------  | ---------- |
+> | System, Remote Desktop | ubuntu   | <token1\>  |
+> | S3 Object Storage      | <name\>  | <token2\>  |
+> | Seafile                | <email\> | <token3\>  |
+> | Hedgedoc               | <email\> | <token4\>  |
+> | Jupyter                |          | <token5\>  |
+> | SSH                    | ubuntu   | <keyfile\> |
 
-You Jupyter token is at line 991 of `~/.jupyter/jupyter_lab_config.py`. Keep the tables in a secure place and do not share with others. 
+If Jupyter password is not provided, it is at line 991 of `~/.jupyter/jupyter_lab_config.py`. If S3 credential is not provided, the name is the same as your container name, and the password is the same as Seafile. Keep the tables in a secure place and do not share with others. 
 
 ::: tip Note
 [OS-level virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization) makes each isolated container look like a dedicated machine from inside, so everyone's username is `ubuntu` . Different containers differ by its hostname. It is *not recommended* to change the username, as you would have a lot of troubles with static configurations.
@@ -119,7 +122,7 @@ If your dataset is smaller than 200 GB, it is recommended to directly load the d
 
 ### Check Credentials
 
-To check your webapp credentials and use the webapps, refer to the [Seafile](https://help.seafile.com/) and [HedgeDoc](https://docs.hedgedoc.org/) documentation. If you requested [Jupyter Lab](./jupyter) or [Remote Desktop](./rdp), refer to the corresponding pages to check if you can log in successfully.
+To check your webapp credentials and use the webapps, refer to the [Seafile](https://help.seafile.com/), [HedgeDoc](https://docs.hedgedoc.org/) and [MinIO](https://min.io/docs/minio/linux/index.html) documentation. If you requested [Jupyter Lab](./jupyter) or [Remote Desktop](./rdp), refer to the corresponding pages to check if you can log in successfully.
 
 ### What's next?
 
