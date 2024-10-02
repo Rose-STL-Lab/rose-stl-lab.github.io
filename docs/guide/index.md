@@ -1,15 +1,17 @@
 # Getting Started
 
 ## Overview
-
-The RoseLab servers are the primary machine learning servers owned and managed by the UCSD CSE [Rose Lab](https://roseyu.com). These servers offer a versatile platform for machine learning researchers to develop and run their models within [Linux Containers](https://linuxcontainers.org/). In addition, RoseLab servers provide access to [Grafana](http://roselab1.ucsd.edu/grafana/) for real-time machine metrics tracking, [Seafile](http://roselab1.ucsd.edu/seafile) for convenient data sharing and backup, [MinIO](https://rosedata.ucsd.edu) for hosting S3 dataset, and [Hedgedoc](https://roselab1.ucsd.edu/hedgedoc) for online markdown collaboration. Further web applications are planned to be added in the future to support the needs of researchers.
+The RoseLab servers are the primary machine learning servers owned and managed by the UCSD CSE [Rose Lab](https://roseyu.com). These servers offer a versatile platform for machine learning researchers to develop and run their models within [Linux Containers](https://linuxcontainers.org/). Additionally, RoseLab servers provide access to [Grafana](http://roselab1.ucsd.edu/grafana/) for real-time machine metrics tracking, [Seafile](http://roselab1.ucsd.edu/seafile) for convenient data sharing and backup, [MinIO](https://rosedata.ucsd.edu) for hosting S3 datasets, [Hedgedoc](https://roselab1.ucsd.edu/hedgedoc) for online markdown collaboration, [WandB](https://rosewandb.ucsd.edu) for self-hosted experiment tracking, and [BetterGPT](https://roselab1.ucsd.edu/chat) as a lab-shared ChatGPT service frontend (contact admin for backend API access). Further web applications are planned to be added in the future to support the needs of researchers.
 
 ### Hardware
 
-The RoseLab servers are located in Rack C05 of the CSE server room 1215 and consist of two primary components:
+The RoseLab servers are located in Rack C05 of the CSE server room 1215, including:
 
-1. Gigabyte G292 **4x A100** GPU server
-2. Supermicro 12-bay Storage server, equipped with **6x 20TB** hard drives.
+1. roselab1: Gigabyte G292-Z40 **4x A100** GPU server
+2. roselab2: Asus ESC8000A **8x RTX4090** GPU server
+3. roselab3: Asus ESC8000A **8x RTX4090** GPU server
+4. roselab4: Gigabyte G482-Z54 **8x L40S** GPU server
+5. rosedata: Supermicro 12-bay Storage server, equipped with **6x 20TB** hard drives.
 
 ::: tip Note
 Please note that the RoseLab servers are still in the early stages of development and any feedback regarding the user experience is highly appreciated. More hardwares are planned for the future. For more information about the rationale behind the servers, please refer to the [Why RoseLab](./why) section.
@@ -74,6 +76,62 @@ ssh ubuntu@roselab1.ucsd.edu -p [id]00 -i ~/.ssh/keyfile
 ```
 
 There are instances where ssh request is blocked when using `UCSD-GUEST`. Switch to another wifi network if this issue occurs. 
+
+#### VSCode RemoteSSH (Optional)
+
+VSCode offers a convenient way to work on remote servers directly from your local environment. To set this up:
+
+1. Create or edit your SSH config file:
+
+   ```bash
+   nano ~/.ssh/config
+   ```
+
+2. Add an entry for your RoseLab container:
+
+   ```
+   Host roselab
+     HostName roselab1.ucsd.edu
+     User ubuntu
+     Port [id]00
+     IdentityFile ~/.ssh/keyfile
+   ```
+
+   Replace `[id]00` with your assigned SSH port.
+
+3. In VSCode, install the "Remote - SSH" extension.
+
+4. Open the Command Palette (Ctrl+Shift+P or Cmd+Shift+P) and search for "Remote-SSH: Connect to Host".
+
+5. Select "roselab" from the list of configured SSH hosts.
+
+#### Troubleshooting: SSH Known Host Issues
+
+If you encounter an SSH connection failure with a message about host key verification or known hosts, it's likely due to changes in the network architecture or server configuration. This is common when servers are rebuilt or IP addresses are reassigned. To resolve this:
+
+1. Remove the old host key from your known_hosts file:
+
+   ```bash
+   ssh-keygen -R [roselab1.ucsd.edu]:[id]00
+   ```
+
+   Replace `[id]00` with your assigned SSH port.
+
+2. After removing the old key, try connecting again. You'll be prompted to add the new host key:
+
+   ```
+   The authenticity of host '[roselab1.ucsd.edu]:[id]00 ([IP_ADDRESS])' can't be established.
+   ED25519 key fingerprint is SHA256:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.
+   Are you sure you want to continue connecting (yes/no/[fingerprint])?
+   ```
+
+3. Type 'yes' to add the new key to your known_hosts file.
+
+This process ensures that your SSH client recognizes the updated host key, allowing you to connect securely to the RoseLab server.
+
+::: tip Note
+If you're still experiencing connection issues after this step, please contact the RoseLab administrator for further assistance. There might be additional network or configuration changes that need to be addressed.
+:::
 
 ### Know Your Container
 
