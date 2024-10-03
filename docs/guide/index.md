@@ -1,113 +1,159 @@
-# Getting Started
+# Getting Started with RoseLab Servers
 
 ## Overview
-The RoseLab servers are the primary machine learning servers owned and managed by the UCSD CSE [Rose Lab](https://roseyu.com). These servers offer a versatile platform for machine learning researchers to develop and run their models within [Linux Containers](https://linuxcontainers.org/). Additionally, RoseLab servers provide access to [Grafana](http://roselab1.ucsd.edu/grafana/) for real-time machine metrics tracking, [Seafile](http://roselab1.ucsd.edu/seafile) for convenient data sharing and backup, [MinIO](https://rosedata.ucsd.edu) for hosting S3 datasets, [Hedgedoc](https://roselab1.ucsd.edu/hedgedoc) for online markdown collaboration, [WandB](https://rosewandb.ucsd.edu) for self-hosted experiment tracking, and [BetterGPT](https://roselab1.ucsd.edu/chat) as a lab-shared ChatGPT service frontend (contact admin for backend API access). Further web applications are planned to be added in the future to support the needs of researchers.
+The RoseLab servers, owned and managed by the UCSD CSE [Rose Lab](https://roseyu.com), provide a robust platform for machine learning research. These servers offer:
+
+- Development and execution of models within [Linux Containers](https://linuxcontainers.org/)
+- Real-time machine metrics tracking via [Grafana](http://roselab1.ucsd.edu/grafana/)
+- Data sharing and backup through [Seafile](http://roselab1.ucsd.edu/seafile)
+- S3 dataset hosting with [MinIO](https://rosedata.ucsd.edu)
+- Online markdown collaboration using [Hedgedoc](https://roselab1.ucsd.edu/hedgedoc)
+- Self-hosted experiment tracking via [WandB](https://rosewandb.ucsd.edu) (contact admin for invitation email)
+- Lab-shared ChatGPT service frontend [BetterGPT](https://roselab1.ucsd.edu/chat) (contact admin for backend API access)
+
+Additional web applications are planned to support future research needs.
 
 ### Hardware
 
-The RoseLab servers are located in Rack C05 of the CSE server room 1215, including:
+Located in Rack C05 of the CSE server room 1215, the RoseLab servers include:
 
-1. roselab1: Gigabyte G292-Z40 **4x A100** GPU server
-2. roselab2: Asus ESC8000A **8x RTX4090** GPU server
-3. roselab3: Asus ESC8000A **8x RTX4090** GPU server
-4. roselab4: Gigabyte G482-Z54 **8x L40S** GPU server
-5. rosedata: Supermicro 12-bay Storage server, equipped with **6x 20TB** hard drives.
+1. roselab1: Gigabyte G292-Z40 (4x A100 GPUs)
+2. roselab2: Asus ESC8000A (8x RTX4090 GPUs)
+3. roselab3: Asus ESC8000A (8x RTX4090 GPUs)
+4. roselab4: Gigabyte G482-Z54 (8x L40S GPUs)
+5. rosedata: Supermicro 12-bay Storage server (6x 20TB hard drives)
+
+Regarding the hardware difference, referring to the Lambda Labs [GPU benchmark](https://lambdalabs.com/gpu-benchmarks).
 
 ::: tip Note
-Please note that the RoseLab servers are still in the early stages of development and any feedback regarding the user experience is highly appreciated. More hardwares are planned for the future. For more information about the rationale behind the servers, please refer to the [Why RoseLab](./why) section.
+The RoseLab servers are in early development. User feedback is appreciated. More hardware additions are planned. For information on the rationale behind the servers, see the [Why RoseLab](./why) section.
 :::
 
 ## Quick Start
 
-You shall apply for a Roselab server container using the [Account Request Form](https://docs.google.com/forms/d/e/1FAIpQLSdKIzsrn1DulFZEW8esUrMVuYtKyMMxax1foBDrDM7OqMb58A/viewform?usp=pp_url). 
+### 1. Apply for Access
 
-* Don't worry too much about your selections, as port mappings and resource quota can be easily adjusted
-* You will have root permission to install or remove any software other than the nvidia driver
-* If you need to switch to a different software image, such as for a new project on reinforcement learning, you can request migration. However, this process requires you to back up all personal files to `/data`.
+Submit your request using the [Account Request Form](https://docs.google.com/forms/d/e/1FAIpQLSdKIzsrn1DulFZEW8esUrMVuYtKyMMxax1foBDrDM7OqMb58A/viewform?usp=pp_url). 
+
+- Don't worry about preset image, port mappings, or resource quota; these can be adjusted later by contacting the admin.
+- Don't worry about your initial machine assignment; you can create containers on other machines once you have access, as described in the [Moving between Machines](./cluster) guide.
+- You'll have root permission to install or remove software (except the NVIDIA driver and kernel modules).
 
 ::: warning
-Please be aware that the host and container nvidia driver version must match, because your GPU tasks within the container will communicate with the host driver kernel module. If you see the message `Failed to initialize NVML: Driver/library version mismatch`, please contact the admin.
+The host and container NVIDIA driver versions must match. (You cannot change host driver versions, which are in the [config table](../config/)) If you see `Failed to initialize NVML: Driver/library version mismatch`, contact the admin.
 :::
 
-Once your request is approved, you will receive an email containing two tables:
+### 2. Access Your Container
 
-> <id\> is a 3-digit number.
-> 
-> | Container Port →               | Host Port |
-> | ------------------------------ | --------- |
-> | 22 (SSH)                       | <id\>00   |
-> | 3389 (RDP)                     | <id\>01   |
-> | 5900 (VNC)                     | <id\>02   |
-> | 80 (HTTP)                      | <id\>03   |
-> | 443 (HTTPS)                    | <id\>04   |
-> | 8080 (Web server, e.g. Tomcat) | <id\>05   |
-> | 8888 (Jupyter)                 | <id\>06   |
-> | 8889 (Backup)                  | <id\>07   |
-> | 8890 (Backup)                  | <id\>08   |
->
-> | description            | account  | password   |
-> | ---------------------- | -------  | ---------- |
-> | System, Remote Desktop | ubuntu   | <token1\>  |
-> | S3 Object Storage      | <name\>  | <token2\>  |
-> | Seafile                | <email\> | <token3\>  |
-> | Hedgedoc               | <email\> | <token4\>  |
-> | Jupyter                |          | <token5\>  |
-> | SSH                    | ubuntu   | <keyfile\> |
+Upon approval, you'll receive an email with two tables:
 
-If Jupyter password is not provided, it is at line 991 of `~/.jupyter/jupyter_lab_config.py`. If S3 credential is not provided, the name is the same as your container name, and the password is the same as Seafile. Keep the tables in a secure place and do not share with others. 
+1. Port mappings table:
+
+   `<id>` is a 3-digit number.
+
+   | Container Port →               | Host Port |
+   | ------------------------------ | --------- |
+   | 22 (SSH)                       | `<id>`00  |
+   | 3389 (RDP)                     | `<id>`01  |
+   | 5900 (VNC)                     | `<id>`02  |
+   | 80 (HTTP)                      | `<id>`03  |
+   | 443 (HTTPS)                    | `<id>`04  |
+   | 8080 (Web server, e.g. Tomcat) | `<id>`05  |
+   | 8888 (Jupyter)                 | `<id>`06  |
+   | 8889 (Backup)                  | `<id>`07  |
+   | 8890 (Backup)                  | `<id>`08  |
+
+2. Account credentials table:
+
+   | description            | account  | password   |
+   | ---------------------- | -------  | ---------- |
+   | System, Remote Desktop | ubuntu   | `<token1>` |
+   | S3 Object Storage      | `<name>` | `<token2>` |
+   | Seafile                | `<email>`| `<token3>` |
+   | Hedgedoc               | `<email>`| `<token4>` |
+   | Jupyter                |          | `<token5>` |
+   | SSH                    | ubuntu   | `<keyfile>`|
 
 ::: tip Note
-[OS-level virtualization](https://en.wikipedia.org/wiki/OS-level_virtualization) makes each isolated container look like a dedicated machine from inside, so everyone's username is `ubuntu` . Different containers differ by its hostname. It is *not recommended* to change the username, as you would have a lot of troubles with static configurations.
+- If Jupyter password is not provided, it is at line 991 of `~/.jupyter/jupyter_lab_config.py`. 
+- If S3 credential is not provided, the name is the same as your container name, and the password is the same as Seafile. 
+- Keep the tables in a secure place and do not share with others.
 :::
 
-### SSH Login
+::: tip Note
+Each container appears as a dedicated machine from the inside. The default username is `ubuntu`. Changing this username is not recommended due to static configurations.
+:::
 
-Move the downloaded private key file to your `~/.ssh` folder. Then, change the file permission such that it is not readable by others.
+### 3. SSH Login
 
-```bash
-chmod 600 ~/.ssh/keyfile
-```
+Assuming access to `roselab1` (replace with your assigned machine if different):
 
-Run the SSH command with your designated port (`-p`).
+#### For Unix-based systems (macOS/Linux):
 
-```bash
-ssh ubuntu@roselab1.ucsd.edu -p [id]00 -i ~/.ssh/keyfile
-(base) ubuntu@account:~$
-```
-
-There are instances where ssh request is blocked when using `UCSD-GUEST`. Switch to another wifi network if this issue occurs. 
-
-#### VSCode RemoteSSH (Optional)
-
-VSCode offers a convenient way to work on remote servers directly from your local environment. To set this up:
-
-1. Create or edit your SSH config file:
-
+1. Move the private key to `~/.ssh` and set permissions:
    ```bash
-   nano ~/.ssh/config
+   mv path/to/keyfile ~/.ssh/
+   chmod 600 ~/.ssh/keyfile
    ```
 
-2. Add an entry for your RoseLab container:
-
+2. Connect via SSH:
+   ```bash
+   ssh ubuntu@roselab1.ucsd.edu -p <id>00 -i ~/.ssh/keyfile
    ```
-   Host roselab
+
+#### For Windows:
+
+1. If you're using PowerShell or Command Prompt:
+   - Move the keyfile to a known location (e.g., `C:\Users\YourUsername\.ssh\`)
+   - You may need to follow this [StackOverflow guide](https://stackoverflow.com/questions/64687271/how-to-avoid-permission-denied-publickey-ssh-key-windows) to set the correct permissions.
+
+2. Connect via SSH:
+   ```powershell
+   ssh ubuntu@roselab1.ucsd.edu -p <id>00 -i C:\Users\YourUsername\.ssh\keyfile
+   ```
+
+3. If you're using PuTTY:
+   - Convert the keyfile to PPK format using PuTTYgen
+   - In PuTTY, set the hostname to `roselab1.ucsd.edu`, port to `<id>00`
+   - Under Connection > SSH > Auth, browse to your PPK file
+   - Click 'Open' to connect
+
+::: tip Note
+While the login does not require a VPN, the UCSD_GUEST network may block SSH. Please use a different network if you encounter issues.
+:::
+
+#### VSCode RemoteSSH (Recommended)
+
+For a more integrated development experience:
+
+1. Edit `~/.ssh/config`:
+   ```
+   Host roselab1
      HostName roselab1.ucsd.edu
      User ubuntu
-     Port [id]00
+     Port <id>00
      IdentityFile ~/.ssh/keyfile
    ```
 
-   Replace `[id]00` with your assigned SSH port.
+2. Install the "Remote - SSH" VSCode extension.
 
-3. In VSCode, install the "Remote - SSH" extension.
+3. Open the Command Palette (Ctrl+Shift+P or Cmd+Shift+P) and search for "Remote-SSH: Connect to Host".
 
-4. Open the Command Palette (Ctrl+Shift+P or Cmd+Shift+P) and search for "Remote-SSH: Connect to Host".
+4. Select "roselab1" from the list of configured SSH hosts.
 
-5. Select "roselab" from the list of configured SSH hosts.
 
 #### Troubleshooting: SSH Known Host Issues
 
-If you encounter an SSH connection failure with a message about host key verification or known hosts, it's likely due to changes in the network architecture or server configuration. This is common when servers are rebuilt or IP addresses are reassigned. To resolve this:
+If you encounter an SSH connection failure with a message about host key verification, e.g.,
+
+```
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+```
+
+it's likely due to changes in the network architecture or server configuration. This is common when you delete your container and create a new one (see [Moving between Machines](./cluster)). To resolve this:
 
 1. Remove the old host key from your known_hosts file:
 
@@ -127,13 +173,11 @@ If you encounter an SSH connection failure with a message about host key verific
 
 3. Type 'yes' to add the new key to your known_hosts file.
 
-This process ensures that your SSH client recognizes the updated host key, allowing you to connect securely to the RoseLab server.
-
 ::: tip Note
 If you're still experiencing connection issues after this step, please contact the RoseLab administrator for further assistance. There might be additional network or configuration changes that need to be addressed.
 :::
 
-### Know Your Container
+### 4. Explore Your Container
 
 Now let's check the resources assigned to you. First, use `lscpu` to check the CPU cores. Although the CPU indices may differ, you should see 12 online CPU cores. Here's an example output:
 
@@ -173,19 +217,22 @@ data/public                  5.0T  263k  5.0T   1% /public
 It is recommended to use soft links to access your data files on the `/data` HDD. For example, instead of downloading your data files to `/data/project1/sample...pt` and hard-coding their absolute paths, you can create a soft link under the code folder using the `ln -s /data/project1/ /home/ubuntu/project1/data/` command. Then, you can refer to the data files as if they and the code are in the same project structure.
 
 ::: tip
-
-If your dataset is smaller than 200 GB, it is recommended to directly load the dataset from the system disk, as SSD is faster than HDD. You can use the HDD disk to store your completed projects' data.
-
+For datasets under 200 GB, use the faster system SSD. Use HDD for larger or archived project data.
 :::
 
-### Check Credentials
+### 5. Verify Web Application Access
 
-To check your webapp credentials and use the webapps, refer to the [Seafile](https://help.seafile.com/), [HedgeDoc](https://docs.hedgedoc.org/) and [MinIO](https://min.io/docs/minio/linux/index.html) documentation. If you requested [Jupyter Lab](./jupyter) or [Remote Desktop](./rdp), refer to the corresponding pages to check if you can log in successfully.
+Refer to the documentation for [Seafile](https://help.seafile.com/), [HedgeDoc](https://docs.hedgedoc.org/), and [MinIO](https://min.io/docs/minio/linux/index.html) to access these services. For [Jupyter Lab](./jupyter) or [Remote Desktop](./rdp), check the respective pages for login instructions.
 
-### What's next?
+## What's Next?
 
-Congratulations! You are ready to use your resource now. You may have noticed that using a Roselab container is like using a dedicated server. However, there is still some [difference](./limit) which you may want to take a look. You may want to use your own passwords and private key, following the guide in the [Security](./security) section. If you notice that your model is running slowly on the server, you can refer to the [Troubleshooting](./troubleshooting) section for possible solutions.
+Congratulations on setting up your RoseLab container! Here are some next steps:
+
+1. Create additional containers on other machines referring to the [Moving between Machines](./cluster) guide.
+2. Review the [differences](./limit) between containers and dedicated servers.
+3. Enhance your [security](./security) by updating passwords and keys.
+4. If you encounter performance issues, consult the [Troubleshooting](./troubleshooting) section.
 
 ## Support
 
-If you have questions or need help, reach out to the admin Zihao Zhou (ziz244@ucsd.edu).
+For questions or assistance, contact the admin Zihao Zhou (ziz244@ucsd.edu).

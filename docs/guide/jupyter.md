@@ -1,72 +1,128 @@
 # Jupyter Lab
 
 :::tip Note
-This guide is applicable only to who requested Jupyter Lab.
+This guide is applicable only to those who requested Jupyter Lab. The examples use roselab1, but the same principles apply to roselab2~4.
 :::
 
 ## Quick Start
 
-If you did not request port mapping, you will need to use an SSH reverse proxy to access your Jupyter service. After confirming that you can successfully SSH into the server, run the following command:
+### Setting Up Permanent Port Mapping
 
+To set up a permanent HTTPS port mapping for JupyterLab using the common utilities:
+
+1. Navigate to the common utilities directory:
+   ```bash
+   cd /public/common-utilities/
+   ```
+
+2. Run the client script:
+   ```bash
+   python client.py
+   ```
+
+3. Choose option 1: "Add or delete port mapping"
+
+4. Select "Add a new port mapping"
+
+5. When prompted, enter the following details:
+   - Source port: Choose an available port within your assigned port range (e.g., 25308, if your range is 25300-25399)
+   - Destination port: 8888 (JupyterLab's default port)
+   - Protocol: HTTPS
+
+6. Confirm your choices when prompted
+
+After setting up the HTTPS mapping, you can access JupyterLab securely via `https://roselab1.ucsd.edu:25308` (replace 25308 with your chosen port number).
+
+:::tip Note
+HTTPS mapping adds a security layer and is more browser-friendly, but it only supports hosted HTTP web services.
+:::
+
+### SSH Port Forwarding
+
+If you didn't request port mapping, you'll need to use SSH port forwarding to access your Jupyter service. After confirming successful SSH access to the server:
+
+1. If you've configured your `.ssh/config` file:
+
+   ```bash
+   laptop$ ssh -fN -L 8888:localhost:8888 roselab1
+   ```
+
+2. If you haven't configured `.ssh/config`:
+
+   ```bash
+   laptop$ ssh -fN -L 8888:localhost:8888 ubuntu@roselab1.ucsd.edu -p <ssh-port> -i path/to/keyfile
+   ```
+
+These commands initiate a background connection forwarding your local port 8888 to the remote Jupyter service. Access your server at `http://localhost:8888`. You may need to rerun the command if the network environment changes.
+
+### Using Visual Studio Code
+
+If you're using Visual Studio Code with the Remote SSH extension:
+
+1. Connect to your RoseLab server.
+2. Go to the "Ports" view in the left or bottom sidebar.
+3. Click on "Forward a Port" and enter 8888.
+4. Access Jupyter Lab at `http://localhost:8888`.
+
+## Troubleshooting Port Occupancy
+
+If you encounter a "port already in use" error:
+
+For macOS/Linux:
 ```bash
-laptop$ ssh -fN -L 8888:localhost:8888 ubuntu@roselab1.ucsd.edu -p ssh-port -i path/to/keyfile
+sudo lsof -i :8888
 ```
 
-This command initiates a background connection that forwards all your connections to `localhost:8888` to your remote Jupyter service. You can then access your server at `http://localhost:8888`. Please note that you may need to rerun the command if the network environment changes.
+For Windows (PowerShell):
+```powershell
+Get-NetTCPConnection -LocalPort 8888
+```
 
-If your requested port mapping, you can access your Jupyter service directly at `http://roselab1.ucsd.edu:<jupyter-port>`. SSH forwarding provides an extra layer of security, as you can see. 
+These commands will show processes using port 8888. You can then close the conflicting process or choose a different port.
 
 ## Configuration
 
-Jupyter Lab is set up as a service running at `localhost:8888` and is configured in `/etc/systemd/system/jupyterlab.service`. If you accidentally kill the service, it will restart in a few seconds.
+Jupyter Lab runs as a service on `localhost:8888`, configured in `/etc/systemd/system/jupyterlab.service`. If killed, it will restart within seconds.
 
-By default, Jupyter Lab comes with a strong fixed password. To change the password, edit the file `~/.jupyter/jupyter_lab_config.py` and look for the line:
+To change the default password, edit `~/.jupyter/jupyter_lab_config.py`:
 
 ```py
-c.ServerApp.token = 'your-current-token'
+c.ServerApp.token = 'your-new-password'
 ```
 
-Change the token to your desired password and save the file. Then, run `sudo systemctl restart jupyterlab` to apply the changes.
+Save the file and run `sudo systemctl restart jupyterlab` to apply changes.
 
 :::warning
-
-If you choose to change the password, please use a strong password, especially if your service is publicly accessible. You won't need to repeatedly enter the password since Jupyter Lab will remember your login.
+Use a strong password, especially for publicly accessible services. Jupyter Lab will remember your login.
 :::
 
-## Adding Environment
+## Adding Environments
 
-Jupyter Lab is installed in the Anaconda *base* environment. The recommended way to add a new environment is through Anaconda. Here's an example of adding a Python 3.8 environment:
-
-```bash
-# Starting with the base environment
-# Change "py38" to your env name and "3.8" to your Python version
-(base)$ conda create -n py38 python=3.8  # Create a new "py38" environment
-(base)$ conda activate py38  # Activate the new environment
-(py38)$ conda install -c anaconda ipykernel  # Install ipykernel support
-(py38)$ python -m ipykernel install --user --name=py38  # Add new kernel config
-```
-
-You should now be able to see the new kernel in Jupyter Lab. If you remove an environment, run the following command to remove the kernel configuration:
+Jupyter Lab uses the Anaconda *base* environment. To add a new environment:
 
 ```bash
-# Change py38 to your env name
-rm -rf /home/ubuntu/.local/share/jupyter/kernels/py38  
+(base)$ conda create -n py38 python=3.8
+(base)$ conda activate py38
+(py38)$ conda install -c anaconda ipykernel
+(py38)$ python -m ipykernel install --user --name=py38
 ```
 
+To remove an environment's kernel configuration:
 
+```bash
+rm -rf /home/ubuntu/.local/share/jupyter/kernels/py38
+```
 
 ## Debugging
 
-If Jupyter Lab shuts down unexpectedly or doesn't accept your connection, run the following command to see the service log:
+If Jupyter Lab malfunctions, check the service log:
 
 ```bash
-$ journalctl -u jupyterlab -n 100  # Show last 100 lines of the log
-...
-Feb 15 23:44:33 user systemd[1]: jupyterlab.service: A process of this unit has been killed by the OOM killer.
-Feb 15 23:44:33 user jupyter: [ServerApp] received signal 15, stopping
-Feb 15 23:44:33 user jupyter: [ServerApp] Shutting down 3 extensions
-Feb 15 23:44:33 user jupyter: [ServerApp] Shutting down 2 terminals
-Feb 15 23:44:35 user systemd[1]: jupyterlab.service: Failed with result 'oom-kill'.
+$ journalctl -u jupyterlab -n 100
 ```
 
-A common reason for an unexpected shutdown is out-of-memory. Please often track your GPU and memory usage at [Grafana](http://roselab1.ucsd.edu/).
+Common issues include out-of-memory errors. Monitor your GPU and memory usage regularly at [Grafana](http://roselab1.ucsd.edu/).
+
+:::tip Note
+Replace roselab1 with your assigned server (roselab2, roselab3, or roselab4) in all examples.
+:::

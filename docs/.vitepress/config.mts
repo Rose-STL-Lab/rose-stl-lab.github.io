@@ -21,7 +21,6 @@ export default defineConfig({
   ],
 
   vue: {
-    reactivityTransform: true,
   },
 
   themeConfig: {
@@ -61,6 +60,10 @@ export default defineConfig({
             {
               text: 'Getting Started',
               link: '/guide/',
+            },
+            {
+              text: 'Moving between Machines',
+              link: '/guide/cluster',
             },
             {
               text: 'Limitations',
