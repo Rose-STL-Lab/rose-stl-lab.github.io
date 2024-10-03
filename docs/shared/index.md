@@ -6,10 +6,10 @@ After the containerization migration, the CSE shared servers are now under the m
 
 ## Hardware
 
-north: Supermicro SYS-4029GP-TRT: 2x Intel(R) Xeon(R) Gold 6230 CPU,  384 GB RAM, 6 TB data SSD + 4 TB home SSD, 8x Nvidia Geforce RTX 2080Ti GPU
-south: Supermicro SYS-4029GP-TRT: 2x Intel(R) Xeon(R) Gold 6230 CPU,  384 GB RAM, 6 TB data SSD + 4 TB home SSD, 8x Nvidia Geforce RTX 2080Ti GPU
-east:  Supermicro SYS-4029GP-TRT: 2x Intel(R) Xeon(R) Gold 6246R CPU, 384 GB RAM, 6 TB data SSD + 4 TB home SSD, 8x Nvidia Geforce RTX 2080Ti GPU
-west:  Supermicro SYS-4029GP-TRT: 2x Intel(R) Xeon(R) Gold 6246R CPU, 384 GB RAM, 6 TB data SSD + 4 TB home SSD, 8x Nvidia Geforce RTX 2080Ti GPU
+1. north: Supermicro SYS-4029GP-TRT: 2x Intel(R) Xeon(R) Gold 6230 CPU,  384 GB RAM, 6 TB data SSD + 4 TB home SSD, 8x Nvidia Geforce RTX 2080Ti GPU
+2. south: Supermicro SYS-4029GP-TRT: 2x Intel(R) Xeon(R) Gold 6230 CPU,  384 GB RAM, 6 TB data SSD + 4 TB home SSD, 8x Nvidia Geforce RTX 2080Ti GPU
+3. east:  Supermicro SYS-4029GP-TRT: 2x Intel(R) Xeon(R) Gold 6246R CPU, 384 GB RAM, 6 TB data SSD + 4 TB home SSD, 8x Nvidia Geforce RTX 2080Ti GPU
+4. west:  Supermicro SYS-4029GP-TRT: 2x Intel(R) Xeon(R) Gold 6246R CPU, 384 GB RAM, 6 TB data SSD + 4 TB home SSD, 8x Nvidia Geforce RTX 2080Ti GPU
 
 ## Key Differences from RoseLab
 
