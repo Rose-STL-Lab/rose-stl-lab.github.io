@@ -44,11 +44,23 @@ export default defineConfig({
     },
 
     nav: [
-      { text: 'Guide', link: '/guide/', activeMatch: '/guide/' },
+      { text: 'Roselab Guide', link: '/guide/', activeMatch: '/guide/' },
+      { text: 'CSE Public Server Guide', link: '/shared/', activeMatch: '/shared/' },
       { text: 'Config', link: '/config/', activeMatch: '/config/' }
     ],
 
     sidebar: {
+      '/shared/': [
+        {
+          text: 'Shared',
+          items: [
+            {
+              text: 'Shared Servers',
+              link: '/shared/',
+            },
+          ],
+        }
+      ],
       '/guide/': [
         {
           text: 'Guide',

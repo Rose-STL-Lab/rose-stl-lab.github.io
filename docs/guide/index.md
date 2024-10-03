@@ -205,6 +205,10 @@ To see the file system, run `df -H` . You would see
 * a 5 TB private data HDD mounted under `/data` that is only accessible to you, and
 * a 5 TB public data HDD mounted under `/public` that is accessible to everyone.
 
+::: tip Note
+The system SSD is faster but has limited space and is local to the machine. The HDD is synchronized between machines and is suitable for large datasets. When you modify files in `/data` in one container, the changes will be reflected in your containers on all other machines. Use the HDD for larger or archived project data.
+:::
+
 ```bash
 $ df -H
 Filesystem                   Size  Used Avail Use% Mounted on
@@ -215,10 +219,6 @@ data/public                  5.0T  263k  5.0T   1% /public
 ```
 
 It is recommended to use soft links to access your data files on the `/data` HDD. For example, instead of downloading your data files to `/data/project1/sample...pt` and hard-coding their absolute paths, you can create a soft link under the code folder using the `ln -s /data/project1/ /home/ubuntu/project1/data/` command. Then, you can refer to the data files as if they and the code are in the same project structure.
-
-::: tip
-For datasets under 200 GB, use the faster system SSD. Use HDD for larger or archived project data.
-:::
 
 ### 5. Verify Web Application Access
 
