@@ -4,6 +4,13 @@
 
 After the containerization migration, the CSE shared servers are now under the management of the RoseLab. The CSE shared servers (north, south, east, and west) also provide a containerized environment for research and development. Each user has their own isolated container with dedicated resources and sudo access.
 
+## Hardware
+
+north: Supermicro SYS-4029GP-TRT: 2x Intel(R) Xeon(R) Gold 6230 CPU,  384 GB RAM, 6 TB data SSD + 4 TB home SSD, 8x Nvidia Geforce RTX 2080Ti GPU
+south: Supermicro SYS-4029GP-TRT: 2x Intel(R) Xeon(R) Gold 6230 CPU,  384 GB RAM, 6 TB data SSD + 4 TB home SSD, 8x Nvidia Geforce RTX 2080Ti GPU
+east:  Supermicro SYS-4029GP-TRT: 2x Intel(R) Xeon(R) Gold 6246R CPU, 384 GB RAM, 6 TB data SSD + 4 TB home SSD, 8x Nvidia Geforce RTX 2080Ti GPU
+west:  Supermicro SYS-4029GP-TRT: 2x Intel(R) Xeon(R) Gold 6246R CPU, 384 GB RAM, 6 TB data SSD + 4 TB home SSD, 8x Nvidia Geforce RTX 2080Ti GPU
+
 ## Key Differences from RoseLab
 
 1. **Fixed Server Assignment**: Unlike RoseLab, you cannot move between machines. Your container is fixed to the assigned server. Your data directory is `/data/<username>` instead of `/data` (due to the backward compatibility with the previous setup). Your data directory is not synced between servers.
