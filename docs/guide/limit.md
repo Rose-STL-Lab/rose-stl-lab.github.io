@@ -72,8 +72,7 @@ It is technically feasible to create a Docker container inside your container, b
 
 > LXC upstream's position is that those containers aren't and cannot be root-safe. They are still valuable in an environment where you are running trusted workloads or where no untrusted task is running as root in the container. —— [Linux Containers - LXC - Security](https://linuxcontainers.org/lxc/security/)
 
-Our position is Docker-based development should be deployed to the Nautilus cluster. However, you may request privilege on a short term basis with valid reason (e.g., to build a Docker image for your accepted paper).
-
+Our position is Docker-based development should be deployed to the Nautilus cluster. However, you may request privilege on a short term basis with valid reason (e.g., to build a Docker image for your accepted paper). However, docker overlay2 storage driver [does not work well with LXC](https://discuss.linuxcontainers.org/t/problem-running-docker-inside-lxc-container/10392), so you may need to downgrade docker to 2.3.0 in order to use the removed `overlay` driver. See [Troubleshooting](/troubleshooting.md) for more information.
 
 
 ## Firewall

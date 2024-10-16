@@ -38,6 +38,48 @@ $ ssh -fN -L 3389:localhost:3340 ubuntu@roselab1.ucsd.edu -p port -i /path/to/ke
 $ # You can then connect to RDP at rdp://localhost:3340
 ```
 
+## Docker in Container
+
+You may see the following error when trying to pull a Docker image in your container:
+
+```bash
+Pulling netflow  ... extracting (100.0%)
+ERROR: failed to register layer: Error ...
+```
+
+This is because the Docker's latest overlay2 storage driver does not work well with LXC. However, the legacy `overlay` driver has been removed from Docker 2.4.0. You can downgrade Docker to 2.3.0 to use the `overlay` driver. 
+
+#### Solution
+
+First, remove your existing Docker installation.
+
+```bash
+sudo systemctl stop docker
+sudo apt-get remove docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+Then, install Docker 2.3.0.
+
+```bash
+sudo apt-get update
+sudo apt-get install docker-ce=5:23.0.0-1~ubuntu.22.04~jammy docker-ce-cli=5:23.0.0-1~ubuntu.22.04~jammy containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+Start the Docker service and verify the installation.
+
+```bash
+sudo systemctl start docker
+docker --version
+```
+
+Pin the package version to prevent automatic upgrades:
+
+```bash
+sudo apt-mark hold docker-ce docker-ce-cli
+```
+
+Now you can pull Docker images in your container.
+
 ## Machine Learning Threshold
 
 We recommend the our users to regularly inspect their [resource usage](http://roselab1.ucsd.edu) during GPU tasks to optimize their tasks.
