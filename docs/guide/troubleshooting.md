@@ -58,7 +58,22 @@ sudo systemctl stop docker
 sudo apt-get remove docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-Then, install Docker 2.3.0.
+Then, modifies the Docker daemon configuration file:
+
+```bash
+sudo nano /etc/docker/daemon.json
+```
+
+add or modify the "storage-driver" option in the file:
+
+```json
+{
+    ...,
+    "storage-driver": "overlay"
+}
+```
+
+install Docker 2.3.0.
 
 ```bash
 sudo apt-get update
