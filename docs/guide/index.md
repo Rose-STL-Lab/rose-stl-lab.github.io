@@ -21,7 +21,8 @@ Located in Rack C05 of the CSE server room 1215, the RoseLab servers include:
 2. roselab2: Asus ESC8000A: 2x AMD EPYC 7282 CPU, 512 GB RAM, 4 TB home SSD, 8x NVIDIA GeForce RTX 4090 GPUs
 3. roselab3: Asus ESC8000A: 2x AMD EPYC 7282 CPU, 512 GB RAM, 4 TB home SSD, 8x NVIDIA GeForce RTX 4090 GPUs
 4. roselab4: Gigabyte G482-Z54: 2x AMD EPYC 7313 CPU, 1 TB RAM, 8 TB home SSD, 8 x NVIDIA L40S GPUs
-5. rosedata: Supermicro 12-bay Storage server (6x 20TB hard drives)
+5. roselab5: Asus ESC N8-E11V: 2x Intel Xeon PLATINUM 8558, 2 TB RAM, 16 TB home SSD, 8 x NVIDIA H200 GPUs
+6. rosedata: Supermicro 12-bay Storage server (6x 20TB hard drives)
 
 Regarding the hardware difference, referring to the Lambda Labs [GPU benchmark](https://lambdalabs.com/gpu-benchmarks).
 
