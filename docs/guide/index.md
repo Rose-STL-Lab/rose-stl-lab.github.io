@@ -18,8 +18,8 @@ Additional web applications are planned to support future research needs.
 Located in Rack C05 of the CSE server room 1215, the RoseLab servers include:
 
 1. roselab1: Gigabyte G292-Z40: 2x AMD EPYC 7453 CPU, 512 GB RAM, 4 TB home SSD, 2 x NVIDIA A100 80GB PCIe GPUs, 2 x NVIDIA A100 40GB PCIe GPUs
-2. roselab2: Asus ESC8000A: 2x AMD EPYC 7282 CPU, 512 GB RAM, 4 TB home SSD, 8x NVIDIA GeForce RTX 4090 GPUs
-3. roselab3: Asus ESC8000A: 2x AMD EPYC 7282 CPU, 512 GB RAM, 4 TB home SSD, 8x NVIDIA GeForce RTX 4090 GPUs
+2. roselab2: Asus ESC8000A: 2x AMD EPYC 7282 CPU, 512 GB RAM, 4 TB home SSD, 8x NVIDIA GeForce RTX 4090 GPUs (Currently offline due to insufficient power supply)
+3. roselab3: Asus ESC8000A: 2x AMD EPYC 7282 CPU, 512 GB RAM, 4 TB home SSD, 8x NVIDIA GeForce RTX 4090 GPUs (Currently offline due to insufficient power supply)
 4. roselab4: Gigabyte G482-Z54: 2x AMD EPYC 7313 CPU, 1 TB RAM, 8 TB home SSD, 8 x NVIDIA L40S GPUs
 5. roselab5: Asus ESC N8-E11V: 2x Intel Xeon PLATINUM 8558, 2 TB RAM, 16 TB home SSD, 8 x NVIDIA H200 GPUs
 6. rosedata: Supermicro 12-bay Storage server (6x 20TB hard drives)
