@@ -233,6 +233,7 @@ Congratulations on setting up your RoseLab container! Here are some next steps:
 2. Review the [differences](./limit) between containers and dedicated servers.
 3. Enhance your [security](./security) by updating passwords and keys.
 4. If you encounter performance issues, consult the [Troubleshooting](./troubleshooting) section.
+5. If you need to run Docker inside your container, see our [Docker in LXC guide](./docker).
 
 ## Support
 

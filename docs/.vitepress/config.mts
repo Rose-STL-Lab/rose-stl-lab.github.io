@@ -90,6 +90,10 @@ export default defineConfig({
               link: '/guide/rdp',
             },
             {
+              text: 'Docker in LXC',
+              link: '/guide/docker',
+            },
+            {
               text: 'Password and Security',
               link: '/guide/security',
             },
