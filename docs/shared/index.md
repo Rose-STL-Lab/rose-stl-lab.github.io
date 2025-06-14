@@ -15,7 +15,7 @@ After the containerization migration, the CSE shared servers are now under the m
 
 1. **Fixed Server Assignment**: Unlike RoseLab, you cannot move between machines. Your container is fixed to the assigned server. Your data directory is `/data/<username>` instead of `/data` (due to the backward compatibility with the previous setup). Your data directory is not synced between servers.
 
-2. **No Common Utilities**: The shared servers do not have access to the common utilities available in RoseLab for managing containers or port mappings.
+2. **No Common Utilities**: The shared servers do not have access to the common utilities available in RoseLab at `/utilities/` for managing containers or port mappings.
 
 3. **Limited Software**: The shared servers come with a basic setup. Additional software installations are the responsibility of the user.
 

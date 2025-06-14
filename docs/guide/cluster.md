@@ -4,8 +4,8 @@ The RoseLab environment provides a powerful utility for managing and migrating y
 
 ## Accessing the Utility
 
-1. On any RoseLab container, navigate to `/public/common-utilities/`
-2. Run the command: `python client.py`. You might need to install Python 3.8+ and libraries like `requests` and `json`.
+1. On any RoseLab container, navigate to `/utilities/`
+2. Run the command: `python common-utilities.py`. You might need to install Python 3.8+ and libraries like `requests` and `json`.
 
 ## Key Features
 
@@ -77,7 +77,7 @@ The utility implements strict security measures:
 - It only accepts connections from the RoseLAN intranet.
 - Users can only manage containers under their own name.
 - You cannot modify other users' port mappings.
-- The /public/common-utilities/ folder is only visible to the ubuntu user, not even to root.
+- The /utilities/ folder is only visible to the ubuntu user, not even to root.
 - Non-ubuntu container users (unless with sudo or API key) cannot shut down or delete containers using this utility.
 
 ::: warning

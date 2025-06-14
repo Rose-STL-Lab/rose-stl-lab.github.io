@@ -12,12 +12,12 @@ To set up a permanent HTTPS port mapping for JupyterLab using the common utiliti
 
 1. Navigate to the common utilities directory:
    ```bash
-   cd /public/common-utilities/
+   cd /utilities/
    ```
 
 2. Run the client script:
    ```bash
-   python client.py
+   python common-utilities.py
    ```
 
 3. Choose option 1: "Add or delete port mapping"
