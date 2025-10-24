@@ -46,6 +46,7 @@ export default defineConfig({
     nav: [
       { text: 'Roselab Guide', link: '/guide/', activeMatch: '/guide/' },
       { text: 'CSE Public Server Guide', link: '/shared/', activeMatch: '/shared/' },
+      { text: 'System Status', link: '/status/', activeMatch: '/status/' },
       { text: 'Config', link: '/config/', activeMatch: '/config/' }
     ],
 
@@ -60,6 +61,30 @@ export default defineConfig({
             },
           ],
         }
+      ],
+      '/status/': [
+        {
+          text: 'System Status',
+          items: [
+            {
+              text: 'Current Status',
+              link: '/status/',
+            },
+          ],
+        },
+        {
+          text: 'Related',
+          items: [
+            {
+              text: 'Software Versions',
+              link: '/config/',
+            },
+            {
+              text: 'Grafana Dashboard',
+              link: 'http://roselab1.ucsd.edu/grafana/',
+            },
+          ],
+        },
       ],
       '/guide/': [
         {
@@ -76,6 +101,14 @@ export default defineConfig({
             {
               text: 'Moving between Machines',
               link: '/guide/cluster',
+            },
+            {
+              text: 'Multi-Server Workflow',
+              link: '/guide/workflow',
+            },
+            {
+              text: 'Data Management',
+              link: '/guide/data-management',
             },
             {
               text: 'Limitations',
@@ -104,10 +137,14 @@ export default defineConfig({
           ],
         },
         {
-          text: 'Config',
+          text: 'System Info',
           items: [
             {
-              text: 'Versions',
+              text: 'Current Status',
+              link: '/status/',
+            },
+            {
+              text: 'Software Versions',
               link: '/config/',
             },
           ],

@@ -4,6 +4,8 @@ layout: doc
 
 # Config
 
+**Last Updated**: October 24, 2025
+
 ## Software Info
 
 | Name                             | Version   | Installation Method                                          | Location                                                     | Uninstall Method                                             |
