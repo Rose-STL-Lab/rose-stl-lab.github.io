@@ -65,6 +65,105 @@ Check your allocated resources using similar commands as in RoseLab.
 If the data drive is full, you (or your PI) would need to purchase your own additional storage, since Roselab admins cannot delete users' files on their behalf. Roselab admins can only provide guidance on mounting your storage and mapping it to your container. Contact the RoseLab admins for more information.
 :::
 
+## Understanding Shared Resources: Storage and Sustainability
+
+### How the Shared Servers Work
+
+The CSE shared servers operate on a **collaborative infrastructure model**:
+
+- **Compute resources** (CPUs, GPUs, RAM) are shared among all users
+- **Base storage** (4TB home, 6TB shared data) was established through initial lab contributions
+- **Additional storage** is provided by individual labs purchasing their own drives
+- **Administration** is provided on a volunteer basis
+
+**Key principle**: Disks don't come from nowhere. When your lab needs storage, your lab provides storage.
+
+### Storage You Can Count On
+
+When you or your PI purchases storage for your lab:
+- **Dedicated access**: Only your lab members can use the space you bought
+- **Better performance**: Your own SSD means no I/O contention with other users
+- **Guaranteed availability**: The storage you purchase is yours, not subject to shared resource pressure
+- **Admin support**: We'll mount and configure it for your lab's exclusive use
+
+When you don't purchase storage:
+- **Limited quota**: Shared pool provides 128GB per user (subject to availability)
+- **Performance degradation**: Shared disks can reach 100% I/O utilization during peak usage
+- **No guarantees**: Shared storage may become full, blocking your work
+
+### What You Need
+
+**Compatible hardware**: 2.5" NVMe SSD with **U.2 or U.3 connector** (strongly preferred over SATA for performance)
+
+**Recommended options**:
+
+**Consumer grade** (best price/performance for most users):
+- Samsung 870 QVO/EVO 4TB: ~$250-300
+- Samsung 870 QVO/EVO 8TB: ~$500-600
+- Budget option: Refurbished consumer SSDs on eBay
+
+**Enterprise grade** (higher endurance and performance):
+- Samsung PM983/PM9A3 series (U.2): 4TB ~$300-400, 8TB ~$600-800
+- Micron 7450/9400 series (U.2/U.3): 4TB ~$350-450, 8TB ~$700-900
+- Intel D7 series (U.2/U.3): Similar pricing to Micron
+- Budget option: Refurbished enterprise drives on eBay (~30-50% discount)
+
+**Capacity guide**:
+- Single user with typical datasets: 4TB minimum
+- Multiple lab members or large datasets: 8TB recommended
+- Heavy I/O workloads: Consider enterprise NVMe for better endurance
+
+### Acknowledging Contributors
+
+We're grateful to the labs that have invested in the shared infrastructure:
+
+- **Rose Lab** - for significant infrastructure investments and ongoing administrative support
+- **Berg-Kirkpatrick Lab** - for storage contributions
+
+These contributions have made high-quality GPU computing accessible to dozens of researchers across CSE.
+
+### Why This Matters
+
+The shared servers serve 45+ users across multiple labs. As usage grows, so does the demand for storage and I/O bandwidth.
+
+**This creates a choice**:
+- **Contribute when you benefit**: Labs that use the servers can purchase storage proportional to their needs
+- **Everyone benefits**: Your investment gives your lab guaranteed resources while reducing pressure on shared storage
+
+Without ongoing contributions, the system faces resource exhaustion - leading to full disks, degraded performance, and blocked research for everyone.
+
+### Getting Storage for Your Lab
+
+If you need more storage than the base allocation:
+
+1. **Discuss with your PI**: Explain your storage needs and the benefits of dedicated drives
+2. **Purchase compatible SSD**: Any 2.5" SATA/NVMe drive works (see recommendations above)
+3. **Contact RoseLab admins**: We'll mount the drive and configure it for your lab's exclusive access
+
+::: info Email Template for Your PI
+Subject: Storage Purchase Request for CSE Shared GPU Servers
+
+Dear Prof. [PI Name],
+
+I'm using the CSE shared GPU servers for [project name] and have encountered storage limitations. The server admin suggests our lab purchase dedicated storage.
+
+**Details**:
+- Required: 2.5" NVMe SSD with U.2 or U.3 connector
+- Recommended capacity: 4-8TB
+- Consumer option: Samsung 870 QVO/EVO 4TB (~$250-300) or 8TB (~$500-600)
+- Enterprise option: Samsung PM9A3 or Micron 7450 series (~$300-900 depending on capacity)
+
+**Benefits**:
+- Exclusive use by our lab only
+- Better I/O performance than shared storage
+- Admin handles mounting and configuration
+
+Could we discuss this? The storage bottleneck is currently affecting [specific task].
+
+Best regards,
+[Your Name]
+:::
+
 ## Support
 
 Roselab admins provide only limited support for the shared servers. Remember to keep your access credentials secure and do not share them with others. 
