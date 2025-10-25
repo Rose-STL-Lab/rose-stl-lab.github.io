@@ -85,5 +85,55 @@ When running machine learning tasks, large datasets are often loaded from disk. 
 
 PyTorch has a build-in data prefetching mechanism. While the GPU is training a batch, `torch.utils.data.DataLoader` will load the data for next batch. By default, there is a total of 2 * `num_workers` batches prefetched across all workers. The `num_workers` is by default 0. If you face slow disk reading speed, consider increasing the number of workers.
 
+## NVIDIA Driver Issues
+
+### Driver/Library Version Mismatch
+
+If you see the error message:
+
+```bash
+Failed to initialize NVML: Driver/library version mismatch
+```
+
+This indicates that your container's NVIDIA driver is out of sync with the host system.
+
+#### Cause
+
+The host and container NVIDIA driver versions must match exactly. This mismatch typically occurs after:
+- Server maintenance or reboots
+- Host driver updates
+- Container restoration from backup
+
+::: warning
+You **cannot** change host driver versions yourself - these are managed by the admin and documented in the [config table](../config/).
+:::
+
+#### Solution
+
+1. **Use the NVIDIA upgrade script** (recommended):
+   ```bash
+   sudo /utilities/nvidia-upgrade.sh
+   sudo reboot
+   ```
+
+2. **Wait for automatic reboot**: After running the script, your container will reboot to apply the new driver.
+
+3. **Verify the fix**: After reboot, check that CUDA is working:
+   ```bash
+   nvidia-smi
+   python -c "import torch; print(torch.cuda.is_available())"
+   ```
+
+::: danger Important
+**Never install nvidia-driver through your package manager** (apt, yum, etc.). This will break GPU passthrough and prevent your container from accessing GPUs. Always use the provided upgrade script.
+:::
+
+### Current Driver Version
+
+As of the latest server migration (October 2024), all NVIDIA drivers have been upgraded to version **580.95.05**. You can verify your driver version with:
+
+```bash
+nvidia-smi | grep "Driver Version"
+```
 
 

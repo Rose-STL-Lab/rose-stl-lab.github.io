@@ -15,6 +15,15 @@ RoseLab provides five servers (roselab1-5) that you can use simultaneously. This
 - "I thought I fixed this bug already... did I do it on roselab2 or roselab3?"
 - "Which server has my newest experimental results?"
 
+::: tip Server Selection Guidelines
+The lab maintains a [Server Selection Spreadsheet](https://docs.google.com/spreadsheets/d/1aTKbCNTq0guwF144nnNwXgWHBZ8lwyzOLQC5vKHU6mk/edit?usp=sharing) where you should claim your main server. This helps:
+- Avoid interruptions when someone runs heavy jobs
+- Prevent bottlenecks by balancing load across servers
+- Match your workload to the right GPU type (4090 vs A100 vs L40S vs H200)
+
+Review the guidelines in the spreadsheet to choose the most appropriate server for your typical workload.
+:::
+
 **Example Strategy**:
 ```
 roselab1: Main development server (always has latest code)

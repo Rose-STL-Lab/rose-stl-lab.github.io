@@ -93,7 +93,87 @@ This is because the request made by an outsider, after being forwarded by the ho
 
 As a result, it is not recommended to establish your own firewall inside the container. If you want to control access to your service, for example, only allowing your work PC to access your Jupyter Lab, please contact the admin to add a firewall rule to the host OS.
 
+## Memory Limits
 
+Each container has a memory quota that varies by server. When your processes exceed the allocated memory limit, the container will be automatically killed to protect the host system.
+
+### Memory Enforcement Policy
+
+The lab uses a **hard enforcement policy** for memory limits:
+- When your processes exceed the memory quota, the container will be immediately killed
+- There is no grace period or soft limit
+- Pay close attention to your processes' memory usage to avoid unexpected termination
+
+### Monitoring Memory Usage
+
+You can monitor your container's RAM usage on [Grafana](http://roselab1.ucsd.edu/grafana/):
+
+1. Navigate to the container metrics dashboard
+2. Check the "Memory Usage" panel to see current and historical usage
+3. Set up alerts if your usage approaches the quota
+
+### Memory Quota by Server
+
+Each RoseLab server has different RAM capacity and quota allocation:
+
+- **roselab1**: 512 GB total RAM, standard quota per container
+- **roselab2**: 512 GB total RAM, standard quota per container
+- **roselab3**: 512 GB total RAM, standard quota per container
+- **roselab4**: 1 TB total RAM, 2x standard quota per container
+- **roselab5**: 2 TB total RAM, 4x standard quota per container
+
+::: tip Moving to Higher-Memory Servers
+If your workload requires more memory than your current allocation:
+1. Move your container to roselab5 (4x quota) using `/utilities/common-utilities.py`
+2. Contact Rose for resource request approval if even roselab5's quota is insufficient
+3. After approval, contact the admin to increase your specific quota
+:::
+
+### Reducing Memory Usage
+
+If you're hitting memory limits:
+
+1. **Profile your code** to identify memory leaks:
+   ```python
+   # Use memory_profiler
+   from memory_profiler import profile
+
+   @profile
+   def my_function():
+       # Your code here
+       pass
+   ```
+
+2. **Reduce batch size** in training:
+   ```python
+   # Smaller batch size uses less memory
+   train_loader = DataLoader(dataset, batch_size=16)  # instead of 32
+   ```
+
+3. **Use gradient accumulation** instead of large batches:
+   ```python
+   # Accumulate gradients over multiple steps
+   accumulation_steps = 4
+   for i, (inputs, labels) in enumerate(train_loader):
+       outputs = model(inputs)
+       loss = criterion(outputs, labels)
+       loss = loss / accumulation_steps
+       loss.backward()
+
+       if (i + 1) % accumulation_steps == 0:
+           optimizer.step()
+           optimizer.zero_grad()
+   ```
+
+4. **Clear unused variables**:
+   ```python
+   import gc
+   del large_variable
+   gc.collect()
+   torch.cuda.empty_cache()  # For GPU memory
+   ```
+
+5. **Use data streaming** instead of loading entire datasets into memory
 
 
 

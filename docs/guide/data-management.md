@@ -20,6 +20,10 @@ RoseLab servers provide two types of storage with different characteristics. Und
 - **Scope**: Synchronized across all RoseLab servers (roselab1-5)
 - **Best for**: Large datasets, checkpoints, archived data
 
+::: warning Storage Capacity
+The lab's shared storage is at high utilization. New drives are on the way to expand capacity. In the meantime, please be mindful of storage usage and clean up unnecessary data regularly. Contact the admin if you need assistance with storage management.
+:::
+
 ### `/public` Directory (Shared Network HDD)
 
 - **Size**: 5 TB total (shared among all users)
@@ -216,6 +220,10 @@ If you encounter storage capacity issues:
    # Clean conda/pip caches
    conda clean --all
    pip cache purge
+
+   # Or use the common utility to clean pip cache with temporary quota lift
+   python /utilities/common-utilities.py
+   # Select the "Clean pip cache" option
    ```
 
 2. **Move cold data to `/data`**:

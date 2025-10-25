@@ -15,8 +15,10 @@ The utility offers several options:
 2. Copy container
 3. Start container
 4. Stop container
-5. Remove container
-6. Create new container
+5. Kill container (force stop)
+6. Remove container
+7. Create new container
+8. Clean pip cache (with temporary quota lift)
 
 ## Container Migration Process
 
@@ -27,7 +29,30 @@ To migrate your container to another server:
 
 ## Creating New Containers
 
-Use option 6 to create a new container from preset images on any available server.
+Use option 7 to create a new container from preset images on any available server.
+
+## Troubleshooting Stuck Containers
+
+If your container becomes stuck and unresponsive (e.g., due to memory issues or process deadlocks):
+
+1. Try option 4 to stop the container normally
+2. If the container won't stop, use option 5 to kill the container (force stop)
+3. After killing, you can restart the container with option 3
+
+::: warning
+Killing a container forcefully terminates all processes without cleanup. Only use this option when the container is truly stuck and won't respond to normal stop commands.
+:::
+
+## Managing Storage
+
+If you're running out of storage quota, use option 8 to clean pip caches:
+
+1. Select "Clean pip cache" from the menu
+2. The utility will temporarily lift your storage quota
+3. Pip caches will be removed to free up space
+4. Your quota will be restored after cleanup
+
+This is particularly useful when you've installed many Python packages and pip's cache is consuming significant space.
 
 ## Benefits of Using This Utility
 

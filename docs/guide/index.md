@@ -9,7 +9,11 @@ The RoseLab servers, owned and managed by the UCSD CSE [Rose Lab](https://roseyu
 - S3 dataset hosting with [MinIO](https://rosedata.ucsd.edu)
 - Online markdown collaboration using [Hedgedoc](https://roselab1.ucsd.edu/hedgedoc)
 - Self-hosted experiment tracking via [WandB](https://rosewandb.ucsd.edu) (contact admin for invitation email)
-- Lab-shared ChatGPT service frontend [RoseLibreChat](https://roselab1.ucsd.edu:3407/) (contact admin for backend API access)
+- Lab-shared AI chat interface [RoseLibreChat](https://roselab1.ucsd.edu:3407/) using lab credits (contact admin for access)
+
+::: warning Privacy Notice for RoseLibreChat
+Most AI models available through RoseLibreChat are **not self-hosted** - they connect to external APIs (OpenAI, Anthropic, etc.). Do not share confidential, proprietary, or sensitive information through this service if you have privacy concerns. The lab provides this service using shared credits for convenience, not as a secure private deployment.
+:::
 
 Additional web applications are planned to support future research needs.
 
