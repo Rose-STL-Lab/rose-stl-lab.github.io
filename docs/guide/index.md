@@ -45,7 +45,7 @@ Submit your request using the [Account Request Form](https://docs.google.com/for
 - You'll have root permission to install or remove software (except the NVIDIA driver and kernel modules).
 
 ::: warning
-The host and container NVIDIA driver versions must match. (You cannot change host driver versions, which are in the [config table](../config/)) If you see `Failed to initialize NVML: Driver/library version mismatch`, contact the admin.
+The host and container NVIDIA driver versions must match. If you see `Failed to initialize NVML: Driver/library version mismatch`, use the fix script: `sudo /utilities/nvidia-upgrade.sh && sudo reboot`. See the [Troubleshooting](./troubleshooting#nvidia-driver-issues) guide for details.
 :::
 
 ### 2. Access Your Container
@@ -184,7 +184,7 @@ If you're still experiencing connection issues after this step, please contact t
 
 ### 4. Explore Your Container
 
-Now let's check the resources assigned to you. First, use `lscpu` to check the CPU cores. Although the CPU indices may differ, you should see 12 online CPU cores. Here's an example output:
+Now let's check the resources assigned to you. First, use `lscpu` to check the CPU cores. Although the CPU indices may differ, you should see your allocated CPU cores. Here's an example output:
 
 ```bash
 $ lscpu
@@ -195,7 +195,7 @@ CPU(s):                  56
 ...
 ```
 
-Next, you can inspect the memory assigned to you using the `/proc/meminfo` file. You should see around 128 GB of total RAM. 
+Next, you can inspect the memory assigned to you using the `/proc/meminfo` file. The memory quota varies by server (see [Limitations](./limit#memory-quota-by-server) for details). 
 
 ```bash
 $ cat /proc/meminfo
@@ -204,9 +204,13 @@ MemFree:        96093828 kB
 MemAvailable:   96883860 kB
 ```
 
-To see the file system, run `df -H` . You would see 
+::: tip Note
+Memory quotas differ by server: roselab1-3 have standard quota, roselab4 has 2x quota, and roselab5 has 4x quota. See the [Memory Limits](./limit#memory-limits) section for more information.
+:::
 
-* the system SSD with around 256 GB of available space,
+To see the file system, run `df -H` . You would see
+
+* the system SSD (size varies by server),
 * a 5 TB private data HDD mounted under `/data` that is only accessible to you, and
 * a 5 TB public data HDD mounted under `/public` that is accessible to everyone.
 

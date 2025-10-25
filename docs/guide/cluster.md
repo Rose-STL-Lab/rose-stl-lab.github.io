@@ -56,7 +56,7 @@ This is particularly useful when you've installed many Python packages and pip's
 
 ## Benefits of Using This Utility
 
-- Access to multiple servers (roselab1~4) independently
+- Access to multiple servers (roselab1-5) independently
 - Quick replication of your environment on another server when your primary server is overloaded
 - Easy synchronization of environments across multiple servers
 - Set up external access to JupyterLab, TCP services, or web services without SSH forwarding
@@ -94,7 +94,7 @@ HTTPS adds a security layer and is more browser-friendly but only supports hoste
 
 ## Automation
 
-You can create scripts for frequent or scheduled synchronization. The current inter-server bandwidth is 25Gbps, with plans to upgrade to 100Gbps. The 300MB/s data transfer rate is well within these limits.
+You can create scripts for frequent or scheduled synchronization. The inter-server bandwidth is 100Gbps after the October 2024 server migration. The 300MB/s data transfer rate is well within these limits.
 
 ## Security Measures
 
