@@ -6,7 +6,7 @@ For real-time system metrics, visit our [Grafana Dashboard](http://roselab1.ucsd
 
 ## Current Status
 
-**Last Updated**: October 24, 2025
+**Last Updated**: October 2025
 
 ### Server Status
 
@@ -17,28 +17,28 @@ For real-time system metrics, visit our [Grafana Dashboard](http://roselab1.ucsd
 | roselab3 | 🟢 Online | All systems operational |
 | roselab4 | 🟢 Online | All systems operational |
 | roselab5 | 🟢 Online | All systems operational |
-| rosedata | 🔴 Offline | Down for data recovery |
+| rosedata | 🟢 Online | All systems operational |
 
 Legend: 🟢 Online, 🟡 Degraded Performance, 🔴 Offline, 🔵 Maintenance
 
 ### Storage Status
 
-::: warning Storage Capacity Alert
-Our 120TB HDD cluster is currently at **98% capacity**. We are actively researching and deleting outdated data. Please avoid saving new large datasets to `/data` until additional storage is provisioned.
+::: info Storage Update
+The lab's shared storage had previously been at high utilization. We've freed up approximately 20TB of space and new drives are on the way to expand capacity. Please continue to be mindful of storage usage.
 :::
 
 | Storage Pool | Total | Used | Available | Usage |
 |--------------|-------|------|-----------|-------|
-| 120TB HDD Cluster | 120TB | ~118TB | ~2TB | 98% |
+| Shared HDD Cluster | ~140TB | Varies | ~20TB+ | Manageable |
 | Per-user `/data` | 5TB | Varies | Varies | Check with `df -h /data` |
 | Per-user `/public` | 5TB (shared) | Varies | Varies | Check with `df -h /public` |
 
-**Recommendations during storage crunch**:
-1. Avoid saving new large datasets to `/data`
-2. Archive or compress old datasets
-3. Move cold data to local servers or external storage temporarily
-4. Clean up intermediate experiment results
-5. Contact admin for data cleanup assistance
+**Best practices for storage management**:
+1. Store large datasets on `/data` (synchronized across servers)
+2. Keep environments and code on local SSD
+3. Archive or compress old datasets
+4. Clean up intermediate experiment results regularly
+5. Use `/utilities/common-utilities.py` to clean pip cache if needed
 
 ### Current NVIDIA Driver Version
 
@@ -52,17 +52,15 @@ If you accidentally corrupt your NVIDIA driver, use `/utilities/nvidia-upgrade.s
 
 ## Recent System Updates
 
-### October 4, 2025
-- **Server Status**: roselab2 and roselab3 are back online. All five roselab servers are now operational.
-- **NVIDIA Driver Upgrade**: All NVIDIA drivers have been upgraded to version **580.95.05**
-  - Users should NOT install nvidia-driver through package managers
-  - Recovery tool available: `/utilities/nvidia-upgrade.sh`
-- **Storage Alert**: 120TB HDD cluster at 98% capacity
-  - Admin is actively researching and deleting outdated data
-  - Waiting for approval to order additional disks
-  - Temporary workaround: Some containers removed to free up space
-
-### [Add previous updates chronologically]
+### October 2025
+- **Server Migration Complete**: All five roselab servers migrated to new network architecture
+  - Server room move completed (wave 4, Oct 2)
+  - Improved data loading speed between servers
+  - Network upgraded to 100Gbps
+  - roselab5 now has all 8x H200 GPUs online
+- **roselab2 & roselab3 Back Online**: All NVIDIA drivers upgraded to version **580.95.05**
+- **rosedata Recovered**: Storage server back online after data recovery
+- **Storage Update**: Freed up ~20TB of space, new drives on the way
 
 ## Scheduled Maintenance
 
@@ -85,24 +83,21 @@ There is currently no scheduled maintenance. This page will be updated if mainte
 
 ## Known Issues
 
-### Storage Space Limitations
+::: tip No Active Issues
+There are currently no major known issues. All servers and services are operational.
+:::
 
-**Issue**: 120TB cluster approaching capacity
-**Status**: 🔴 Active Issue
-**Impact**: Users may not be able to save new large datasets
-**Workaround**:
-- Use local SSD for active work when possible
-- Archive old data
-- Contact admin for cleanup assistance
-**ETA**: Pending hardware procurement approval
+<!--
+### Example Active Issue Format:
 
-### rosedata Server Down
+### Issue Name
 
-**Issue**: rosedata storage server offline for data recovery
-**Status**: 🔴 Active Issue
-**Impact**: S3/MinIO services may be limited
-**Workaround**: Use `/data` for storage
-**ETA**: To be determined
+**Issue**: Description
+**Status**: 🔴 Active Issue / 🟡 Under Investigation / 🟢 Monitoring
+**Impact**: What users experience
+**Workaround**: Temporary solutions
+**ETA**: Expected resolution time
+-->
 
 <!--
 ### Example Resolved Issue:
@@ -119,10 +114,10 @@ There is currently no scheduled maintenance. This page will be updated if mainte
 |---------|--------|-----|-------|
 | Grafana | 🟢 Online | [roselab1.ucsd.edu/grafana](http://roselab1.ucsd.edu/grafana/) | Real-time metrics |
 | Seafile | 🟢 Online | [roselab1.ucsd.edu/seafile](http://roselab1.ucsd.edu/seafile) | File sharing |
-| MinIO | 🟡 Degraded | [rosedata.ucsd.edu](https://rosedata.ucsd.edu) | Limited due to rosedata offline |
+| MinIO | 🟢 Online | [rosedata.ucsd.edu](https://rosedata.ucsd.edu) | S3 object storage |
 | HedgeDoc | 🟢 Online | [roselab1.ucsd.edu/hedgedoc](https://roselab1.ucsd.edu/hedgedoc) | Markdown collaboration |
 | WandB | 🟢 Online | [rosewandb.ucsd.edu](https://rosewandb.ucsd.edu) | Experiment tracking |
-| RoseLibreChat | 🟢 Online | [roselab1.ucsd.edu:3407](https://roselab1.ucsd.edu:3407/) | ChatGPT frontend |
+| RoseLibreChat | 🟢 Online | [roselab1.ucsd.edu:3407](https://roselab1.ucsd.edu:3407/) | AI chat interface (API-based) |
 
 ## Monitoring Your Resources
 
@@ -183,13 +178,13 @@ Important system updates are posted in the lab Slack channel **#server**. Make s
 ### 2025
 
 **October 2025**:
-- Oct 4: roselab2, roselab3 back online; Driver upgrade to 580.95.05; Storage at 98%
-
-**September 2025**:
-- Sep 25: roselab2, roselab3 offline for maintenance
-- Sep 10: rosedata taken offline for data recovery
-
-[Add more historical entries as needed]
+- Oct 2-4: Server room migration (wave 4)
+- Oct 4: roselab2, roselab3 back online; All systems operational
+- Oct 11: Power outage for room finalization (mid-afternoon recovery)
+- Driver upgrade to 580.95.05
+- Network upgraded to 100Gbps
+- roselab5 H200 GPUs online
+- Storage freed up ~20TB
 
 ---
 

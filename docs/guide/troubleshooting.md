@@ -130,7 +130,7 @@ You **cannot** change host driver versions yourself - these are managed by the a
 
 ### Current Driver Version
 
-As of the latest server migration (October 2024), all NVIDIA drivers have been upgraded to version **580.95.05**. You can verify your driver version with:
+As of the latest server migration (October 2025), all NVIDIA drivers have been upgraded to version **580.95.05**. You can verify your driver version with:
 
 ```bash
 nvidia-smi | grep "Driver Version"

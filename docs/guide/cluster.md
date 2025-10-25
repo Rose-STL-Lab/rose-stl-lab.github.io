@@ -94,7 +94,7 @@ HTTPS adds a security layer and is more browser-friendly but only supports hoste
 
 ## Automation
 
-You can create scripts for frequent or scheduled synchronization. The inter-server bandwidth is 100Gbps after the October 2024 server migration. The 300MB/s data transfer rate is well within these limits.
+You can create scripts for frequent or scheduled synchronization. The inter-server bandwidth is 100Gbps after the October 2025 server migration. The 300MB/s data transfer rate is well within these limits.
 
 ## Security Measures
 
