@@ -136,4 +136,42 @@ As of the latest server migration (October 2025), all NVIDIA drivers have been u
 nvidia-smi | grep "Driver Version"
 ```
 
+## File Permissions on `/data`
+
+### Cannot Use chown/chgrp on `/data`
+
+If you find that you cannot change file ownership or group on `/data` using `chown` or `chgrp` commands, even with `sudo`, this is expected behavior due to NFS security features.
+
+```bash
+$ sudo chown username:groupname /data/some-folder
+# Operation not permitted or no effect
+```
+
+#### Cause
+
+The `/data` directory is a network-mounted filesystem (NFS) that is physically hosted on **roselab1** and mounted on all other servers (roselab2-5). NFS has security restrictions that prevent non-root users from changing file ownership, and LXC container root users are not considered "true" root users from the NFS perspective.
+
+This is not a bug but a security feature of network-mounted filesystems to prevent unauthorized ownership changes across the network.
+
+#### Solution
+
+To change file permissions or ownership on `/data`:
+
+1. **SSH into your container on roselab1** (where `/data` is physically hosted):
+   ```bash
+   ssh ubuntu@roselab1.ucsd.edu -p your-port
+   ```
+
+2. **Run chown/chgrp commands there**:
+   ```bash
+   sudo chown username:groupname /data/your-folder
+   sudo chmod 755 /data/your-folder
+   ```
+
+3. The changes will be immediately visible across all servers since `/data` is synchronized.
+
+::: tip
+If you need to perform bulk permission changes, it's most efficient to do them from roselab1 where the storage is physically located.
+:::
+
 
