@@ -128,31 +128,30 @@ sudo mkdir -p /var/lib/docker/fuse-overlayfs/l
 sudo systemctl start docker
 ```
 
-## Configuration: AppArmor Settings Only
+## Configuration: Keep daemon.json Minimal
 
 ::: tip Important - Storage Driver Configuration
 **Do NOT add `storage-driver` to daemon.json**. Let Docker auto-detect from the directory structure we created above.
 :::
 
-For Docker 29.0+ in LXC, we only need to configure AppArmor settings to allow containers to run:
+::: danger Important - AppArmor Configuration
+**Do NOT add `default-security-opt` to daemon.json** in LXC containers. Docker 29.0's strict validation will fail even with this setting. Instead, specify AppArmor settings per-container in docker-compose.yml or docker run commands.
+:::
+
+For most users, `daemon.json` should be **empty** or contain only non-storage, non-AppArmor settings:
 
 ```bash
-sudo vim /etc/docker/daemon.json
+# Option 1: No daemon.json at all (recommended for new installs)
+# Don't create /etc/docker/daemon.json
+
+# Option 2: Empty daemon.json
+echo '{}' | sudo tee /etc/docker/daemon.json
 ```
 
-Add **only** the AppArmor configuration:
-
+::: warning NVIDIA Runtime Users Only
+If you need NVIDIA container runtime, this is the ONLY thing that should be in daemon.json:
 ```json
 {
-  "default-security-opt": ["apparmor=unconfined"]
-}
-```
-
-::: warning NVIDIA Runtime Users
-If you have NVIDIA container runtime, include it but still **do NOT** specify storage-driver:
-```json
-{
-  "default-security-opt": ["apparmor=unconfined"],
   "runtimes": {
     "nvidia": {
       "args": [],
@@ -161,6 +160,7 @@ If you have NVIDIA container runtime, include it but still **do NOT** specify st
   }
 }
 ```
+**Do NOT add** `default-security-opt` or `storage-driver` alongside this.
 :::
 
 ## Starting Docker
@@ -201,9 +201,9 @@ docker run hello-world
 # Error: permission denied
 ```
 
-**Solution 1: Add AppArmor Override When Running Containers (Recommended)**
+**Solution: Add AppArmor Override When Running Containers (Required)**
 
-Add `--security-opt apparmor=unconfined` to your Docker commands:
+You **must** add `--security-opt apparmor=unconfined` to every Docker container you run:
 
 ```bash
 # Single container
@@ -229,32 +229,8 @@ services:
       - "3000:3000"
 ```
 
-**Solution 2: Set Global Docker Default**
-
-If you didn't configure AppArmor during initial setup, you can add it now:
-
-```bash
-sudo vim /etc/docker/daemon.json
-```
-
-Add `default-security-opt` (and **ONLY** this - do NOT add `storage-driver`):
-```json
-{
-  "default-security-opt": ["apparmor=unconfined"]
-}
-```
-
-Restart Docker:
-```bash
-sudo systemctl restart docker
-
-# Verify storage driver is still fuse-overlayfs
-docker info | grep -i "Storage Driver"
-# Should show: Storage Driver: fuse-overlayfs
-```
-
-::: danger Critical Warning
-**Never add `"storage-driver": "fuse-overlayfs"` to daemon.json** in Docker 29.0+ on LXC. This will trigger strict validation and cause Docker to fail. Always rely on the "prior driver" detection mechanism described in the Initial Setup section.
+::: danger Why Not Use daemon.json for AppArmor?
+You might be tempted to add `"default-security-opt": ["apparmor=unconfined"]` to `daemon.json` to avoid specifying it for every container. **Don't do this in LXC**. Docker 29.0's initialization will still trigger strict validation that fails in LXC environments. Always specify AppArmor settings per-container.
 :::
 
 ::: warning Security Note
@@ -304,16 +280,21 @@ Common causes:
 
 **Common causes:**
 
-1. **You added `storage-driver` to daemon.json**
+1. **You added forbidden settings to daemon.json**
    ```bash
    # Check your configuration
    cat /etc/docker/daemon.json
 
-   # If you see "storage-driver": "fuse-overlayfs", REMOVE IT
-   # The correct configuration should ONLY have:
-   {
-     "default-security-opt": ["apparmor=unconfined"]
-   }
+   # Remove these if present:
+   # - "storage-driver": "fuse-overlayfs"      ← Triggers strict validation
+   # - "default-security-opt": [...]           ← Causes validation failures in LXC
+
+   # The correct configuration should be empty or only contain:
+   # - NVIDIA runtime (if needed)
+   # - Registry mirrors, log settings, etc.
+
+   # Simplest fix: make it empty
+   echo '{}' | sudo tee /etc/docker/daemon.json
    ```
 
 2. **Syntax error in daemon.json**
@@ -449,8 +430,9 @@ Running Docker 29.0+ inside LXC containers requires a specific approach:
    - Look for log: `[graphdriver] using prior storage driver: fuse-overlayfs`
 
 2. **AppArmor Configuration**:
-   - Configure `default-security-opt: ["apparmor=unconfined"]` in `daemon.json`
-   - Or add `--security-opt apparmor=unconfined` to individual `docker run` commands
+   - Add `--security-opt apparmor=unconfined` to all `docker run` commands
+   - Or specify `security_opt: - apparmor=unconfined` in docker-compose.yml
+   - Do NOT add `default-security-opt` to daemon.json (will cause validation failures)
    - This resolves runc CVE-2025-52881 compatibility issues
 
 3. **What NOT to Do**:
@@ -474,15 +456,15 @@ sudo mkdir -p /var/lib/docker/fuse-overlayfs/l
 sudo mkdir -p /var/lib/docker/image/fuse-overlayfs/{imagedb,layerdb}/{content,metadata,sha256,mounts,distribution}/sha256
 echo '{"Repositories":{}}' | sudo tee /var/lib/docker/image/fuse-overlayfs/repositories.json
 
-# 3. Configure AppArmor only
-echo '{"default-security-opt": ["apparmor=unconfined"]}' | sudo tee /etc/docker/daemon.json
+# 3. Keep daemon.json empty or minimal
+# Don't create daemon.json, or create empty: echo '{}' | sudo tee /etc/docker/daemon.json
 
 # 4. Start Docker
 sudo systemctl start docker
 
-# 5. Verify
+# 5. Verify and run containers
 sudo docker info | grep "Storage Driver"  # Should show: fuse-overlayfs
-sudo docker run --rm hello-world            # Should work
+sudo docker run --rm --security-opt apparmor=unconfined hello-world  # Note: requires --security-opt
 ```
 
 While fuse-overlayfs has ~10-20% performance overhead compared to native overlay2, it's the only reliable solution for Docker in LXC containers and is vastly superior to the vfs fallback.
