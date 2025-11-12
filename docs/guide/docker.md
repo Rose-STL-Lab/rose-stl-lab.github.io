@@ -122,6 +122,83 @@ sudo systemctl start docker
 
 ## Common Issues and Solutions
 
+### AppArmor Permission Denied (Docker 29.0+)
+
+::: danger Common Issue with Docker 29.0+
+Docker 29.0 introduced security changes (CVE-2025-52881 fix) that may cause permission denied errors in LXC containers. If you encounter these errors, follow the solutions below.
+:::
+
+**Symptoms:**
+```bash
+# Docker service won't start
+sudo systemctl status docker
+# Shows: Failed to start Docker Application Container Engine
+
+# Or containers fail with permission errors:
+docker run hello-world
+# Error: permission denied
+```
+
+**Solution 1: Add AppArmor Override When Running Containers (Recommended)**
+
+Add `--security-opt apparmor=unconfined` to your Docker commands:
+
+```bash
+# Single container
+docker run --rm --security-opt apparmor=unconfined hello-world
+
+# With other options
+docker run -d \
+  --name myapp \
+  --security-opt apparmor=unconfined \
+  -p 3000:3000 \
+  myimage:latest
+```
+
+**For Docker Compose**, add to your `docker-compose.yml`:
+```yaml
+version: '3.8'
+services:
+  web:
+    image: myimage
+    security_opt:
+      - apparmor=unconfined
+    ports:
+      - "3000:3000"
+```
+
+**Solution 2: Set Global Docker Default**
+
+To avoid adding `--security-opt` to every command, set it globally in Docker daemon config:
+
+```bash
+sudo vim /etc/docker/daemon.json
+```
+
+Add `default-security-opt`:
+```json
+{
+  "storage-driver": "fuse-overlayfs",
+  "default-security-opt": ["apparmor=unconfined"]
+}
+```
+
+Restart Docker:
+```bash
+sudo systemctl restart docker
+
+# Verify
+docker info | grep -i apparmor
+```
+
+::: warning Security Note
+Setting AppArmor to `unconfined` reduces container isolation. This is generally acceptable in LXC environments since the LXC container itself provides isolation. However, avoid running untrusted code without additional security measures.
+:::
+
+**If the above solutions don't work:**
+
+Contact your system administrator (RoseLab users: ziz244@ucsd.edu) to verify that your LXC container is configured for nested container support.
+
 ### Permission Denied on Docker Socket
 
 If you encounter:
