@@ -409,15 +409,16 @@ ExecStart=/usr/bin/dockerd --debug
 
 ### About Rootless Docker
 
-::: danger Rootless Docker Not Recommended for LXC
-**Rootless Docker 29.0+ does not work reliably in unprivileged LXC containers**. While Docker may start, containers will fail with overlay mount errors.
+::: tip Rootless Docker: Possible but Not Recommended
+**Rootless Docker can work in LXC containers**, but it requires the exact same "prior driver" directory structure setup as rootful Docker.
 
-Symptoms:
-- Docker daemon starts successfully
-- `docker run` fails with: `failed to mount overlay: invalid argument`
-- Both native overlay and fuse-overlayfs fail in rootless mode
+**Why not use rootless?**
+- Originally, rootless Docker was expected to default to fuse-overlayfs automatically
+- In reality, it **does not default** to fuse-overlayfs in LXC
+- You still need to create the magic directory structure manually
+- Since you need manual configuration anyway, rootful Docker is simpler and more straightforward
 
-**Recommendation**: Use rootful Docker with the configuration described in this guide. The LXC container already provides process isolation, so running Docker as root inside the container is acceptable.
+**Recommendation**: Use rootful Docker with the configuration described in this guide. The LXC container already provides process isolation, so running Docker as root inside the container is acceptable and avoids unnecessary complexity.
 :::
 
 ### Alternative Storage Drivers
@@ -453,9 +454,9 @@ Running Docker 29.0+ inside LXC containers requires a specific approach:
    - This resolves runc CVE-2025-52881 compatibility issues
 
 3. **What NOT to Do**:
-   - ❌ Don't use rootless Docker in LXC (incompatible with Docker 29.0+)
-   - ❌ Don't explicitly set `storage-driver` (triggers strict validation)
+   - ❌ Don't explicitly set `storage-driver` (triggers strict validation → fails)
    - ❌ Don't use vfs or devicemapper (inefficient alternatives)
+   - ⚠️ Rootless Docker works but needs same setup (no advantage, use rootful instead)
 
 4. **LXC Container Requirements**:
    - `security.nesting=true` (for nested containers)
