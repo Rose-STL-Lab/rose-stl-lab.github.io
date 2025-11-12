@@ -3,9 +3,10 @@
 This guide explains how to run Docker inside LXC containers using the fuse-overlayfs storage driver. This is necessary because LXC containers cannot use Docker's default overlay2 storage driver due to kernel limitations.
 
 ::: warning Prerequisites
-- LXC container with FUSE support enabled
+- LXC container with FUSE support enabled and nested containers allowed
 - Root or sudo access inside the container
 - Basic understanding of Docker and systemctl
+- **Docker 29.0+**: Additional AppArmor configuration required (covered below)
 :::
 
 ## Background: Why fuse-overlayfs?
@@ -16,6 +17,20 @@ Docker's default `overlay2` storage driver requires kernel-level permissions tha
 2. The container lacks permissions to create kernel-level overlay filesystems
 
 Without proper configuration, Docker falls back to the `vfs` driver, which creates full copies of each filesystem layer instead of using efficient copy-on-write. This can consume massive amounts of disk space.
+
+## Understanding Docker 29.0's Storage Driver Detection
+
+::: tip Key Insight - Docker's "Prior Driver" Mechanism
+Docker 29.0 introduced stricter storage driver validation. However, there's an important exception: if Docker detects that a storage driver was **previously used** (by checking existing data directories), it will skip the strict validation and continue using that driver. This is called the "prior storage driver" path.
+
+**This means**: We DON'T explicitly configure the storage driver in `daemon.json`. Instead, we create the necessary directory structure that makes Docker think fuse-overlayfs was already in use.
+:::
+
+**Why this matters:**
+- ❌ **Explicit configuration** (`"storage-driver": "fuse-overlayfs"` in daemon.json) → triggers strict validation → fails in LXC
+- ✅ **Prior driver detection** (directories exist) → skips strict validation → works perfectly
+
+You'll see this log when it works: `[graphdriver] using prior storage driver: fuse-overlayfs`
 
 ## Prerequisites Check
 
@@ -48,76 +63,123 @@ sudo apt update
 sudo apt install fuse-overlayfs
 ```
 
-## Configuration Steps
+## Initial Setup: Creating the "Prior Driver" Structure
 
-### 1. Configure Docker Storage Driver
+::: danger Critical Step - Do NOT Skip
+This step is **essential** for Docker 29.0+ in LXC containers. We create directory structure that makes Docker think fuse-overlayfs was previously used, allowing it to bypass strict validation.
+:::
 
-Create or edit the Docker daemon configuration:
+### For New Docker Installations
+
+If you're setting up Docker for the first time, follow these steps **before** starting Docker for the first time:
+
+```bash
+# Stop Docker if it's running
+sudo systemctl stop docker docker.socket 2>/dev/null || true
+
+# Create the fuse-overlayfs driver directory structure
+sudo mkdir -p /var/lib/docker/fuse-overlayfs/l
+
+# Create image metadata directories
+sudo mkdir -p /var/lib/docker/image/fuse-overlayfs/imagedb/content/sha256
+sudo mkdir -p /var/lib/docker/image/fuse-overlayfs/imagedb/metadata/sha256
+sudo mkdir -p /var/lib/docker/image/fuse-overlayfs/layerdb/sha256
+sudo mkdir -p /var/lib/docker/image/fuse-overlayfs/layerdb/mounts
+sudo mkdir -p /var/lib/docker/image/fuse-overlayfs/distribution
+
+# Create empty repositories.json
+echo '{"Repositories":{}}' | sudo tee /var/lib/docker/image/fuse-overlayfs/repositories.json > /dev/null
+
+# Set correct permissions
+sudo chmod 710 /var/lib/docker/fuse-overlayfs
+sudo chmod 700 /var/lib/docker/fuse-overlayfs/l
+sudo chmod -R 700 /var/lib/docker/image/fuse-overlayfs/imagedb
+sudo chmod -R 755 /var/lib/docker/image/fuse-overlayfs/layerdb
+```
+
+::: tip What This Does
+This creates the minimum directory structure that Docker's storage driver detection looks for. When Docker starts, it will:
+1. Scan `/var/lib/docker/` for existing driver directories
+2. Find `fuse-overlayfs/l/` (non-empty due to subdirectory)
+3. Log: `[graphdriver] using prior storage driver: fuse-overlayfs`
+4. Skip strict validation and use fuse-overlayfs successfully
+:::
+
+### For Existing Docker Installations
+
+If you already have Docker installed with a different storage driver and want to switch to fuse-overlayfs:
+
+::: warning Data Loss Warning
+Switching storage drivers will make your existing images and containers inaccessible. Back up any important data before proceeding.
+:::
+
+```bash
+# Stop Docker
+sudo systemctl stop docker docker.socket
+
+# Backup existing data (optional but recommended)
+sudo mv /var/lib/docker /var/lib/docker.backup
+
+# Create the fuse-overlayfs structure (use the commands from above)
+sudo mkdir -p /var/lib/docker/fuse-overlayfs/l
+# ... (repeat all mkdir and echo commands from above)
+
+# Start Docker
+sudo systemctl start docker
+```
+
+## Configuration: AppArmor Settings Only
+
+::: tip Important - Storage Driver Configuration
+**Do NOT add `storage-driver` to daemon.json**. Let Docker auto-detect from the directory structure we created above.
+:::
+
+For Docker 29.0+ in LXC, we only need to configure AppArmor settings to allow containers to run:
 
 ```bash
 sudo vim /etc/docker/daemon.json
 ```
 
-Add the following configuration:
+Add **only** the AppArmor configuration:
 
 ```json
 {
-    "storage-driver": "fuse-overlayfs"
+  "default-security-opt": ["apparmor=unconfined"]
 }
 ```
 
-::: warning NVIDIA Runtime
-If you have NVIDIA container runtime installed, preserve it in the configuration:
+::: warning NVIDIA Runtime Users
+If you have NVIDIA container runtime, include it but still **do NOT** specify storage-driver:
 ```json
 {
-    "storage-driver": "fuse-overlayfs",
-    "runtimes": {
-        "nvidia": {
-            "args": [],
-            "path": "nvidia-container-runtime"
-        }
+  "default-security-opt": ["apparmor=unconfined"],
+  "runtimes": {
+    "nvidia": {
+      "args": [],
+      "path": "nvidia-container-runtime"
     }
+  }
 }
 ```
 :::
 
-### 2. Stop Existing Docker Service
+## Starting Docker
 
-Before applying changes, stop any running Docker service:
-
-```bash
-sudo systemctl stop docker
-sudo systemctl stop docker.socket
-```
-
-### 3. Test Configuration
-
-Test the Docker daemon with the new storage driver:
+Now start Docker and verify it's using fuse-overlayfs:
 
 ```bash
-sudo dockerd --debug
-```
-
-Look for messages confirming fuse-overlayfs is being used. Press `Ctrl+C` to stop once verified.
-
-::: tip Troubleshooting Startup
-If you see an error about conflicting directives:
-```
-unable to configure the Docker daemon with file /etc/docker/daemon.json: 
-the following directives are specified both as a flag and in the configuration file: 
-storage-driver: (from flag: fuse-overlayfs, from file: overlay2)
-```
-This means there's a conflict in your configuration. Check `/etc/default/docker` or systemd service files for conflicting storage driver settings.
-:::
-
-### 4. Enable and Start Docker Service
-
-Once configuration is verified:
-
-```bash
+# Enable and start Docker
 sudo systemctl daemon-reload
 sudo systemctl enable docker
 sudo systemctl start docker
+
+# Verify the storage driver
+sudo docker info | grep "Storage Driver"
+# Should output: Storage Driver: fuse-overlayfs
+
+# Check the logs for confirmation
+sudo journalctl -u docker -n 50 | grep "storage driver"
+# Should see: [graphdriver] using prior storage driver: fuse-overlayfs
 ```
 
 ## Common Issues and Solutions
@@ -169,16 +231,15 @@ services:
 
 **Solution 2: Set Global Docker Default**
 
-To avoid adding `--security-opt` to every command, set it globally in Docker daemon config:
+If you didn't configure AppArmor during initial setup, you can add it now:
 
 ```bash
 sudo vim /etc/docker/daemon.json
 ```
 
-Add `default-security-opt`:
+Add `default-security-opt` (and **ONLY** this - do NOT add `storage-driver`):
 ```json
 {
-  "storage-driver": "fuse-overlayfs",
   "default-security-opt": ["apparmor=unconfined"]
 }
 ```
@@ -187,9 +248,14 @@ Restart Docker:
 ```bash
 sudo systemctl restart docker
 
-# Verify
-docker info | grep -i apparmor
+# Verify storage driver is still fuse-overlayfs
+docker info | grep -i "Storage Driver"
+# Should show: Storage Driver: fuse-overlayfs
 ```
+
+::: danger Critical Warning
+**Never add `"storage-driver": "fuse-overlayfs"` to daemon.json** in Docker 29.0+ on LXC. This will trigger strict validation and cause Docker to fail. Always rely on the "prior driver" detection mechanism described in the Initial Setup section.
+:::
 
 ::: warning Security Note
 Setting AppArmor to `unconfined` reduces container isolation. This is generally acceptable in LXC environments since the LXC container itself provides isolation. However, avoid running untrusted code without additional security measures.
@@ -232,19 +298,57 @@ Common causes:
 - Missing fuse-overlayfs package
 - FUSE not enabled in container
 
-### Storage Driver Conflicts
+### Docker Won't Start After Configuration Changes
 
-If Docker complains about conflicting storage drivers:
+**Symptom**: Docker fails to start after editing `daemon.json`
 
-1. Check all configuration sources:
+**Common causes:**
+
+1. **You added `storage-driver` to daemon.json** ❌
    ```bash
+   # Check your configuration
    cat /etc/docker/daemon.json
-   cat /etc/default/docker
-   systemctl cat docker.service
+
+   # If you see "storage-driver": "fuse-overlayfs", REMOVE IT
+   # The correct configuration should ONLY have:
+   {
+     "default-security-opt": ["apparmor=unconfined"]
+   }
    ```
 
-2. Remove any `--storage-driver` flags from systemd service files
-3. Ensure only one storage driver is specified in `daemon.json`
+2. **Syntax error in daemon.json**
+   ```bash
+   # Validate JSON syntax
+   python3 -m json.tool /etc/docker/daemon.json
+   # Should output formatted JSON if valid
+   ```
+
+3. **Prior driver structure is missing**
+   ```bash
+   # Verify the directories exist
+   ls -la /var/lib/docker/fuse-overlayfs/l/
+   ls -la /var/lib/docker/image/fuse-overlayfs/
+
+   # If missing, recreate them (see Initial Setup section)
+   ```
+
+### Multiple Storage Drivers Detected
+
+**Error**: `contains several valid graphdrivers: overlay2, fuse-overlayfs`
+
+**Cause**: Multiple non-empty driver directories exist in `/var/lib/docker/`
+
+**Solution**:
+```bash
+# List all driver directories
+ls -la /var/lib/docker/ | grep -E 'overlay|fuse'
+
+# Keep only fuse-overlayfs, remove or rename others
+sudo mv /var/lib/docker/overlay2 /var/lib/docker/overlay2.old
+
+# Restart Docker
+sudo systemctl restart docker
+```
 
 ## Performance Considerations
 
@@ -257,18 +361,33 @@ fuse-overlayfs operates in userspace and has performance overhead compared to ke
 
 ## Verification
 
-Verify Docker is using the correct storage driver:
+### Check Storage Driver
+
+Verify Docker is using fuse-overlayfs via the "prior driver" mechanism:
 
 ```bash
+# Check storage driver
 sudo docker info | grep "Storage Driver"
 # Should output: Storage Driver: fuse-overlayfs
+
+# Verify it's using prior driver detection (not explicit config)
+sudo journalctl -u docker --no-pager | grep "storage driver"
+# Should see: [graphdriver] using prior storage driver: fuse-overlayfs
 ```
+
+### Test Container Execution
 
 Test with a simple container:
 
 ```bash
-sudo docker run hello-world
+# Without AppArmor override (may fail)
+sudo docker run --rm hello-world
+
+# With AppArmor override (should work)
+sudo docker run --rm --security-opt apparmor=unconfined hello-world
 ```
+
+If the second command works but the first doesn't, make sure you've configured `default-security-opt` in `daemon.json` as described above.
 
 ## Advanced Configuration
 
@@ -288,14 +407,27 @@ ExecStart=
 ExecStart=/usr/bin/dockerd --debug
 ```
 
-### Alternative: Recent Kernel Support
+### About Rootless Docker
 
-::: tip Kernel 6.1.10+ Users
-Recent kernels (6.1.10+) may support overlay2 in LXC containers natively, especially on ZFS. Test with:
-```bash
-sudo dockerd --storage-driver=overlay2
-```
-If this works, you may not need fuse-overlayfs.
+::: danger Rootless Docker Not Recommended for LXC
+**Rootless Docker 29.0+ does not work reliably in unprivileged LXC containers**. While Docker may start, containers will fail with overlay mount errors.
+
+Symptoms:
+- Docker daemon starts successfully
+- `docker run` fails with: `failed to mount overlay: invalid argument`
+- Both native overlay and fuse-overlayfs fail in rootless mode
+
+**Recommendation**: Use rootful Docker with the configuration described in this guide. The LXC container already provides process isolation, so running Docker as root inside the container is acceptable.
+:::
+
+### Alternative Storage Drivers
+
+::: warning Not Recommended
+While Docker supports other storage drivers (vfs, devicemapper), they are not recommended:
+- **vfs**: Extremely inefficient (3-4x disk space usage)
+- **devicemapper**: Requires complex setup and has performance issues
+
+Stick with fuse-overlayfs for LXC containers.
 :::
 
 ## Related Documentation
@@ -306,4 +438,50 @@ If this works, you may not need fuse-overlayfs.
 
 ## Summary
 
-Running Docker inside LXC containers requires using fuse-overlayfs as a storage driver due to kernel limitations. While this adds some performance overhead, it's a reliable solution that avoids the disk space issues of the vfs driver. Always ensure FUSE support is enabled in your container and carefully manage the Docker daemon configuration to avoid conflicts.
+### Key Takeaways
+
+Running Docker 29.0+ inside LXC containers requires a specific approach:
+
+1. **Storage Driver Setup**:
+   - ✅ Create directory structure that makes Docker auto-detect fuse-overlayfs
+   - ❌ Never explicitly configure `storage-driver` in `daemon.json`
+   - 🔑 Look for log: `[graphdriver] using prior storage driver: fuse-overlayfs`
+
+2. **AppArmor Configuration**:
+   - Configure `default-security-opt: ["apparmor=unconfined"]` in `daemon.json`
+   - Or add `--security-opt apparmor=unconfined` to individual `docker run` commands
+   - This resolves runc CVE-2025-52881 compatibility issues
+
+3. **What NOT to Do**:
+   - ❌ Don't use rootless Docker in LXC (incompatible with Docker 29.0+)
+   - ❌ Don't explicitly set `storage-driver` (triggers strict validation)
+   - ❌ Don't use vfs or devicemapper (inefficient alternatives)
+
+4. **LXC Container Requirements**:
+   - `security.nesting=true` (for nested containers)
+   - `raw.lxc: lxc.apparmor.profile=unconfined` (for AppArmor relaxation)
+   - `/dev/fuse` device access (for fuse-overlayfs)
+
+### Quick Setup Checklist
+
+```bash
+# 1. Install prerequisites
+sudo apt install docker.io fuse-overlayfs
+
+# 2. Create "prior driver" structure
+sudo mkdir -p /var/lib/docker/fuse-overlayfs/l
+sudo mkdir -p /var/lib/docker/image/fuse-overlayfs/{imagedb,layerdb}/{content,metadata,sha256,mounts,distribution}/sha256
+echo '{"Repositories":{}}' | sudo tee /var/lib/docker/image/fuse-overlayfs/repositories.json
+
+# 3. Configure AppArmor only
+echo '{"default-security-opt": ["apparmor=unconfined"]}' | sudo tee /etc/docker/daemon.json
+
+# 4. Start Docker
+sudo systemctl start docker
+
+# 5. Verify
+sudo docker info | grep "Storage Driver"  # Should show: fuse-overlayfs
+sudo docker run --rm hello-world            # Should work
+```
+
+While fuse-overlayfs has ~10-20% performance overhead compared to native overlay2, it's the only reliable solution for Docker in LXC containers and is vastly superior to the vfs fallback.
