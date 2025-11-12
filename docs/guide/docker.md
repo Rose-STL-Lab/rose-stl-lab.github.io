@@ -27,8 +27,8 @@ Docker 29.0 introduced stricter storage driver validation. However, there's an i
 :::
 
 **Why this matters:**
-- ❌ **Explicit configuration** (`"storage-driver": "fuse-overlayfs"` in daemon.json) → triggers strict validation → fails in LXC
-- ✅ **Prior driver detection** (directories exist) → skips strict validation → works perfectly
+- **Explicit configuration** (`"storage-driver": "fuse-overlayfs"` in daemon.json) → triggers strict validation → fails in LXC
+- **Prior driver detection** (directories exist) → skips strict validation → works perfectly
 
 You'll see this log when it works: `[graphdriver] using prior storage driver: fuse-overlayfs`
 
@@ -304,7 +304,7 @@ Common causes:
 
 **Common causes:**
 
-1. **You added `storage-driver` to daemon.json** ❌
+1. **You added `storage-driver` to daemon.json**
    ```bash
    # Check your configuration
    cat /etc/docker/daemon.json
@@ -444,9 +444,9 @@ Stick with fuse-overlayfs for LXC containers.
 Running Docker 29.0+ inside LXC containers requires a specific approach:
 
 1. **Storage Driver Setup**:
-   - ✅ Create directory structure that makes Docker auto-detect fuse-overlayfs
-   - ❌ Never explicitly configure `storage-driver` in `daemon.json`
-   - 🔑 Look for log: `[graphdriver] using prior storage driver: fuse-overlayfs`
+   - Create directory structure that makes Docker auto-detect fuse-overlayfs
+   - Never explicitly configure `storage-driver` in `daemon.json`
+   - Look for log: `[graphdriver] using prior storage driver: fuse-overlayfs`
 
 2. **AppArmor Configuration**:
    - Configure `default-security-opt: ["apparmor=unconfined"]` in `daemon.json`
@@ -454,9 +454,9 @@ Running Docker 29.0+ inside LXC containers requires a specific approach:
    - This resolves runc CVE-2025-52881 compatibility issues
 
 3. **What NOT to Do**:
-   - ❌ Don't explicitly set `storage-driver` (triggers strict validation → fails)
-   - ❌ Don't use vfs or devicemapper (inefficient alternatives)
-   - ⚠️ Rootless Docker works but needs same setup (no advantage, use rootful instead)
+   - Don't explicitly set `storage-driver` (triggers strict validation → fails)
+   - Don't use vfs or devicemapper (inefficient alternatives)
+   - Rootless Docker works but needs same setup (no advantage, use rootful instead)
 
 4. **LXC Container Requirements**:
    - `security.nesting=true` (for nested containers)
