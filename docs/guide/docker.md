@@ -6,7 +6,6 @@ This guide explains how to run Docker inside LXC containers using the fuse-overl
 - LXC container with FUSE support enabled and nested containers allowed
 - Root or sudo access inside the container
 - Basic understanding of Docker and systemctl
-- **Docker 29.0+**: Additional AppArmor configuration required (covered below)
 :::
 
 ## Background: Why fuse-overlayfs?
@@ -134,11 +133,7 @@ sudo systemctl start docker
 **Do NOT add `storage-driver` to daemon.json**. Let Docker auto-detect from the directory structure we created above.
 :::
 
-::: danger Important - AppArmor Configuration
-**Do NOT add `default-security-opt` to daemon.json** in LXC containers. Docker 29.0's strict validation will fail even with this setting. Instead, specify AppArmor settings per-container in docker-compose.yml or docker run commands.
-:::
-
-For most users, `daemon.json` should be **empty** or contain only non-storage, non-AppArmor settings:
+For most users, `daemon.json` should be **empty** or contain only minimal settings:
 
 ```bash
 # Option 1: No daemon.json at all (recommended for new installs)
@@ -160,7 +155,7 @@ If you need NVIDIA container runtime, this is the ONLY thing that should be in d
   }
 }
 ```
-**Do NOT add** `default-security-opt` or `storage-driver` alongside this.
+**Do NOT add** `storage-driver` alongside this.
 :::
 
 ## Starting Docker
@@ -184,62 +179,66 @@ sudo journalctl -u docker -n 50 | grep "storage driver"
 
 ## Common Issues and Solutions
 
-### AppArmor Permission Denied (Docker 29.0+)
+### AppArmor Permission Denied (Docker 28.0+)
 
-::: danger Common Issue with Docker 29.0+
-Docker 29.0 introduced security changes (CVE-2025-52881 fix) that may cause permission denied errors in LXC containers. If you encounter these errors, follow the solutions below.
+::: danger Common Issue with Docker 28.0+
+Docker 28.0+ introduced security changes that cause permission denied errors when checking AppArmor profiles in LXC containers. The error occurs because Docker tries to read `/sys/kernel/security/apparmor/profiles`, which is not accessible from within LXC.
 :::
 
 **Symptoms:**
 ```bash
-# Docker service won't start
-sudo systemctl status docker
-# Shows: Failed to start Docker Application Container Engine
-
-# Or containers fail with permission errors:
+# Containers fail with permission errors:
 docker run hello-world
-# Error: permission denied
+# Error response from daemon: Could not check if docker-default AppArmor profile was loaded:
+# open /sys/kernel/security/apparmor/profiles: permission denied
 ```
 
-**Solution: Add AppArmor Override When Running Containers (Required)**
+**Solution: Tell Docker It's Running in a Container (Recommended)**
 
-You **must** add `--security-opt apparmor=unconfined` to every Docker container you run:
+Create a systemd override that sets `container=lxc` environment variable. This tells Docker to skip AppArmor profile checks entirely:
 
 ```bash
-# Single container
-docker run --rm --security-opt apparmor=unconfined hello-world
-
-# With other options
-docker run -d \
-  --name myapp \
-  --security-opt apparmor=unconfined \
-  -p 3000:3000 \
-  myimage:latest
+sudo mkdir -p /etc/systemd/system/docker.service.d
+cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/lxc-apparmor-fix.conf
+[Service]
+Environment=container=lxc
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
 ```
 
-**For Docker Compose**, add to your `docker-compose.yml`:
+After this, containers work without any extra flags:
+```bash
+docker run --rm hello-world  # Just works!
+```
+
+::: tip Why This Works
+When Docker detects `container=lxc` in its environment, it knows it's running inside a container and skips the AppArmor integration entirely. This is the cleanest solution because:
+- One-time setup, no per-container configuration needed
+- Works with all `docker run` and `docker-compose` commands
+- No need to modify existing docker-compose.yml files
+:::
+
+**Alternative: Per-Container AppArmor Override**
+
+If you prefer not to modify systemd, you can add `--security-opt apparmor=unconfined` to each container:
+
+```bash
+docker run --rm --security-opt apparmor=unconfined hello-world
+```
+
+For Docker Compose, add to each service:
 ```yaml
-version: '3.8'
 services:
   web:
     image: myimage
     security_opt:
       - apparmor=unconfined
-    ports:
-      - "3000:3000"
 ```
 
-::: danger Why Not Use daemon.json for AppArmor?
-You might be tempted to add `"default-security-opt": ["apparmor=unconfined"]` to `daemon.json` to avoid specifying it for every container. **Don't do this in LXC**. Docker 29.0's initialization will still trigger strict validation that fails in LXC environments. Always specify AppArmor settings per-container.
+::: warning
+This alternative requires adding the option to every container, which is tedious and easy to forget. The systemd override approach above is strongly recommended.
 :::
-
-::: warning Security Note
-Setting AppArmor to `unconfined` reduces container isolation. This is generally acceptable in LXC environments since the LXC container itself provides isolation. However, avoid running untrusted code without additional security measures.
-:::
-
-**If the above solutions don't work:**
-
-Contact your system administrator (RoseLab users: ziz244@ucsd.edu) to verify that your LXC container is configured for nested container support.
 
 ### Permission Denied on Docker Socket
 
@@ -361,14 +360,10 @@ sudo journalctl -u docker --no-pager | grep "storage driver"
 Test with a simple container:
 
 ```bash
-# Without AppArmor override (may fail)
 sudo docker run --rm hello-world
-
-# With AppArmor override (should work)
-sudo docker run --rm --security-opt apparmor=unconfined hello-world
 ```
 
-If the second command works but the first doesn't, make sure you've configured `default-security-opt` in `daemon.json` as described above.
+If you get an AppArmor permission denied error, apply the systemd fix described in the [AppArmor section](#apparmor-permission-denied-docker-28-0).
 
 ## Advanced Configuration
 
@@ -429,20 +424,18 @@ Running Docker 29.0+ inside LXC containers requires a specific approach:
    - Never explicitly configure `storage-driver` in `daemon.json`
    - Look for log: `[graphdriver] using prior storage driver: fuse-overlayfs`
 
-2. **AppArmor Configuration**:
-   - Add `--security-opt apparmor=unconfined` to all `docker run` commands
-   - Or specify `security_opt: - apparmor=unconfined` in docker-compose.yml
-   - Do NOT add `default-security-opt` to daemon.json (will cause validation failures)
-   - This resolves runc CVE-2025-52881 compatibility issues
+2. **AppArmor Configuration** (if you get permission denied errors):
+   - Create systemd override with `Environment=container=lxc`
+   - This tells Docker to skip AppArmor checks entirely
+   - One-time setup, no per-container flags needed
 
 3. **What NOT to Do**:
-   - Don't explicitly set `storage-driver` (triggers strict validation → fails)
+   - Don't explicitly set `storage-driver` in daemon.json (triggers strict validation → fails)
    - Don't use vfs or devicemapper (inefficient alternatives)
    - Rootless Docker works but needs same setup (no advantage, use rootful instead)
 
-4. **LXC Container Requirements**:
+4. **LXC Container Requirements** (configured by admin):
    - `security.nesting=true` (for nested containers)
-   - `raw.lxc: lxc.apparmor.profile=unconfined` (for AppArmor relaxation)
    - `/dev/fuse` device access (for fuse-overlayfs)
 
 ### Quick Setup Checklist
@@ -456,15 +449,20 @@ sudo mkdir -p /var/lib/docker/fuse-overlayfs/l
 sudo mkdir -p /var/lib/docker/image/fuse-overlayfs/{imagedb,layerdb}/{content,metadata,sha256,mounts,distribution}/sha256
 echo '{"Repositories":{}}' | sudo tee /var/lib/docker/image/fuse-overlayfs/repositories.json
 
-# 3. Keep daemon.json empty or minimal
-# Don't create daemon.json, or create empty: echo '{}' | sudo tee /etc/docker/daemon.json
+# 3. Fix AppArmor (skip if docker run hello-world already works)
+sudo mkdir -p /etc/systemd/system/docker.service.d
+cat <<EOF | sudo tee /etc/systemd/system/docker.service.d/lxc-apparmor-fix.conf
+[Service]
+Environment=container=lxc
+EOF
 
 # 4. Start Docker
+sudo systemctl daemon-reload
 sudo systemctl start docker
 
-# 5. Verify and run containers
+# 5. Verify
 sudo docker info | grep "Storage Driver"  # Should show: fuse-overlayfs
-sudo docker run --rm --security-opt apparmor=unconfined hello-world  # Note: requires --security-opt
+sudo docker run --rm hello-world  # Should work without any extra flags
 ```
 
 While fuse-overlayfs has ~10-20% performance overhead compared to native overlay2, it's the only reliable solution for Docker in LXC containers and is vastly superior to the vfs fallback.
