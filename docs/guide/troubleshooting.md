@@ -128,6 +128,47 @@ You **cannot** change host driver versions yourself - these are managed by the a
 **Never install nvidia-driver through your package manager** (apt, yum, etc.). This will break GPU passthrough and prevent your container from accessing GPUs. Always use the provided upgrade script.
 :::
 
+### GPU Not Available (NVSwitch Servers Only)
+
+If your GPUs are completely undetectable — `nvidia-smi` shows no devices, and `torch.cuda.is_available()` returns `False` — but other users on the same server are unaffected, this is a startup ordering issue specific to NVSwitch-based GPU servers (currently roselab5 with H200 GPUs).
+
+```bash
+$ nvidia-smi
+No devices were found
+# or
+$ python -c "import torch; print(torch.cuda.is_available())"
+False
+```
+
+::: info
+This issue does **not** affect roselab2/3 (RTX 4090) or roselab4 (L40S), because those GPUs use PCIe direct passthrough and do not require NVIDIA Fabric Manager.
+:::
+
+#### Cause
+
+NVSwitch-based GPUs (H200, H100, A100 SXM, etc.) require the [NVIDIA Fabric Manager](https://docs.nvidia.com/datacenter/tesla/fabric-manager-user-guide/index.html) service to be fully initialized before CUDA can detect the GPUs. After a host reboot, if your LXC container starts before the Fabric Manager finishes initializing, the GPU device nodes (`/dev/nvidia*`, `/dev/nvidia-nvlink`, `/dev/nvidia-nvswitch*`) are not properly injected into the container.
+
+This is a **startup race condition** — containers that happen to start earlier hit the uninitialized window, while containers that start later (after Fabric Manager is ready) work fine. This explains why the issue affects some users but not others on the same server.
+
+#### Solution
+
+The upgrade script re-establishes the user-space driver files and device node mappings inside the container, and the reboot remounts everything:
+
+```bash
+sudo /utilities/nvidia-upgrade.sh
+sudo reboot
+```
+
+After reboot, verify:
+```bash
+nvidia-smi
+python -c "import torch; print(torch.cuda.is_available())"
+```
+
+::: tip
+If GPUs are missing across **all** your containers on the same server, each container needs the fix independently — run the script and reboot on each affected container.
+:::
+
 ### Current Driver Version
 
 As of the latest server migration (October 2025), all NVIDIA drivers have been upgraded to version **580.95.05**. You can verify your driver version with:
