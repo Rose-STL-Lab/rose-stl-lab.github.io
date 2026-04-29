@@ -56,7 +56,7 @@ This is particularly useful when you've installed many Python packages and pip's
 
 ## Benefits of Using This Utility
 
-- Access to multiple servers (roselab1-5) independently
+- Access to multiple servers (roselab1-7) independently
 - Quick replication of your environment on another server when your primary server is overloaded
 - Easy synchronization of environments across multiple servers
 - Set up external access to JupyterLab, TCP services, or web services without SSH forwarding

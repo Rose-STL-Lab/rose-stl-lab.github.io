@@ -17,7 +17,10 @@ For real-time system metrics, visit our [Grafana Dashboard](http://roselab1.ucsd
 | roselab3 | 🟢 Online | All systems operational |
 | roselab4 | 🟢 Online | All systems operational |
 | roselab5 | 🟢 Online | All systems operational |
+| roselab6 | 🟢 Online | All systems operational |
+| roselab7 | 🟢 Online | All systems operational |
 | rosedata | 🟢 Online | All systems operational |
+| rosefastdata | 🟢 Online | All systems operational |
 
 Legend: 🟢 Online, 🟡 Degraded Performance, 🔴 Offline, 🔵 Maintenance
 
@@ -53,7 +56,7 @@ If you accidentally corrupt your NVIDIA driver, use `/utilities/nvidia-upgrade.s
 ## Recent System Updates
 
 ### October 2025
-- **Server Migration Complete**: All five roselab servers migrated to new network architecture
+- **Server Migration Complete**: All roselab servers migrated to new network architecture
   - Server room move completed (wave 4, Oct 2)
   - Improved data loading speed between servers
   - Network upgraded to 100Gbps
@@ -158,7 +161,7 @@ If you encounter any issues:
 
 When reporting issues, please include:
 - Your container name
-- The server(s) affected (roselab1-5)
+- The server(s) affected (roselab1-7)
 - Error messages (if any)
 - Steps to reproduce the issue
 - Output of relevant commands (`nvidia-smi`, `df -h`, etc.)

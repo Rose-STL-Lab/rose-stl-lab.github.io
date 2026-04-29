@@ -121,6 +121,8 @@ Each RoseLab server has different RAM capacity and quota allocation:
 - **roselab3**: 512 GB total RAM, standard quota per container
 - **roselab4**: 1 TB total RAM, 2x standard quota per container
 - **roselab5**: 2 TB total RAM, 4x standard quota per container
+- **roselab6**: 384 GB total RAM, standard quota per container
+- **roselab7**: 384 GB total RAM, standard quota per container
 
 ::: tip Moving to Higher-Memory Servers
 If your workload requires more memory than your current allocation:

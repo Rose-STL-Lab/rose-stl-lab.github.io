@@ -17,7 +17,7 @@ RoseLab servers provide two types of storage with different characteristics. Und
 
 - **Size**: 5 TB per user (private, accessible only to you)
 - **Performance**: Network-mounted HDD over 100Gbps connection
-- **Scope**: Synchronized across all RoseLab servers (roselab1-5)
+- **Scope**: Synchronized across all RoseLab servers (roselab1-7)
 - **Best for**: Large datasets, checkpoints, archived data
 
 ::: warning Storage Capacity

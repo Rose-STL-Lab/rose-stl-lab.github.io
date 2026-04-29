@@ -2,7 +2,7 @@
 
 ## Overview
 
-RoseLab provides five servers (roselab1-5) that you can use simultaneously. This guide helps you develop an efficient workflow to manage your containers across multiple servers while avoiding common pitfalls.
+RoseLab provides seven servers (roselab1-7) that you can use simultaneously. This guide helps you develop an efficient workflow to manage your containers across multiple servers while avoiding common pitfalls.
 
 ## Core Principles
 
@@ -130,7 +130,7 @@ roselab4:
 
 **Setup**:
 ```
-All servers (roselab1-5):
+All servers (roselab1-7):
   - Lightweight containers with just environments
   - All code managed through Git
   - No "main" server needed

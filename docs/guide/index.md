@@ -21,12 +21,15 @@ Additional web applications are planned to support future research needs.
 
 Located in Rack C05 of the CSE server room 1215, the RoseLab servers include:
 
-1. roselab1: Gigabyte G292-Z40: 2x AMD EPYC 7453 CPU, 512 GB RAM, 4 TB home SSD, 2 x NVIDIA A100 80GB PCIe GPUs, 2 x NVIDIA A100 40GB PCIe GPUs
-2. roselab2: Asus ESC8000A: 2x AMD EPYC 7282 CPU, 512 GB RAM, 4 TB home SSD, 8x NVIDIA GeForce RTX 4090 GPUs
-3. roselab3: Asus ESC8000A: 2x AMD EPYC 7282 CPU, 512 GB RAM, 4 TB home SSD, 8x NVIDIA GeForce RTX 4090 GPUs
-4. roselab4: Gigabyte G482-Z54: 2x AMD EPYC 7313 CPU, 1 TB RAM, 8 TB home SSD, 8 x NVIDIA L40S GPUs
+1. roselab1: Gigabyte G292-Z40: 2x AMD EPYC 7453 CPU, 512 GB RAM, 8 TB home SSD, 2 x NVIDIA A100 80GB PCIe GPUs, 2 x NVIDIA A100 40GB PCIe GPUs
+2. roselab2: Asus ESC8000A: 2x AMD EPYC 7282 CPU, 512 GB RAM, 8 TB home SSD, 8x NVIDIA GeForce RTX 4090 GPUs
+3. roselab3: Asus ESC8000A: 2x AMD EPYC 7282 CPU, 512 GB RAM, 8 TB home SSD, 8x NVIDIA GeForce RTX 4090 GPUs
+4. roselab4: Gigabyte G482-Z54: 2x AMD EPYC 7313 CPU, 1 TB RAM, 16 TB home SSD, 8 x NVIDIA L40S GPUs
 5. roselab5: Asus ESC N8-E11V: 2x Intel Xeon PLATINUM 8558, 2 TB RAM, 16 TB home SSD, 8 x NVIDIA H200 GPUs
-6. rosedata: Supermicro SC826 12-bay Storage server (12 x 20TB hard drives)
+6. roselab6: Asus ESC8000A-E13P: 2x AMD EPYC 9365 CPU, 384 GB RAM, 16 TB home SSD, 8 x NVIDIA RTX PRO 6000 Blackwell 96GB GPUs
+7. roselab7: Asus ESC8000A-E13P: 2x AMD EPYC 9365 CPU, 384 GB RAM, 16 TB home SSD, 8 x NVIDIA RTX PRO 6000 Blackwell 96GB GPUs
+8. rosedata (on roselab1): 2 x Supermicro SC826 12-bay JBOD (24 x 20TB HDD) + 3 x 4 TB NVMe cache
+9. rosefastdata (on roselab5): 3 x 28 TB KIOXIA NVMe
 
 Regarding the hardware difference, referring to the Lambda Labs [GPU benchmark](https://lambdalabs.com/gpu-benchmarks).
 
@@ -205,7 +208,7 @@ MemAvailable:   96883860 kB
 ```
 
 ::: tip Note
-Memory quotas differ by server: roselab1-3 have standard quota, roselab4 has 2x quota, and roselab5 has 4x quota. See the [Memory Limits](./limit#memory-limits) section for more information.
+Memory quotas differ by server: roselab1-3 and roselab6-7 have standard quota, roselab4 has 2x quota, and roselab5 has 4x quota. See the [Memory Limits](./limit#memory-limits) section for more information.
 :::
 
 To see the file system, run `df -H` . You would see
